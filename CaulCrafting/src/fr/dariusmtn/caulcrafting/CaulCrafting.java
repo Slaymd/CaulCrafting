@@ -12,7 +12,6 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -24,11 +23,48 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import fr.dariusmtn.caulcrafting.itemsname.Itemsname;
+import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_10_R1;
+import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_11_R1;
+import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_12_R1;
+
 public class CaulCrafting extends JavaPlugin implements Listener {
 	
 	public void onEnable(){
 		Bukkit.getPluginManager().registerEvents(this, this);
 		saveDefaultConfig();
+		if(setupItemsname()){
+			nmsItemsName = true;
+		} else {
+			getLogger().severe("CaulCrafting is not fully compatible with your server version.");
+			getLogger().severe("Check CaulCrafting updates !");
+			nmsItemsName = false;
+		}
+	}
+	
+	static Itemsname itemsname = null;
+	static boolean nmsItemsName = false;
+	
+	public static Itemsname getItemsname(){
+		return itemsname;
+	}
+	
+	private boolean setupItemsname(){
+		String version;
+		try{
+			version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+		} catch (Exception e){
+			return false;
+		}
+		//Gestion des versions
+		if(version.equalsIgnoreCase("v1_12_R1")){
+			itemsname = new Itemsname_1_12_R1();
+		} else if(version.equalsIgnoreCase("v1_11_R1")){
+			itemsname = new Itemsname_1_11_R1();
+		} else if(version.equalsIgnoreCase("v1_10_R1")){
+			itemsname = new Itemsname_1_10_R1();
+		}
+		return itemsname != null;
 	}
 	
 	HashMap<Player,Integer> editor = new HashMap<Player,Integer>();
@@ -61,7 +97,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 								player.sendMessage("§f§l§m-----");
 								player.sendMessage("§7Write §oexit§7 to leave this editor.");
 								player.sendMessage("§7Write §cremovelast§7 to remove the last item you added.");
-								player.sendMessage("§eWrite §2next§e to go to next step.");
+								player.sendMessage("§eWrite §2next§e to go to the next step.");
 								player.sendMessage("§d§l§m-----");
 								return true;
 							}
@@ -205,18 +241,17 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	}
 	
 	public static String getName(ItemStack stack) {
-		String name = "";
-		try{
-			name =  CraftItemStack.asNMSCopy(stack).getName();
-		} catch (Exception e){
+		if(nmsItemsName == true){
+			return getItemsname().getItemStackName(stack);
+		} else {
+			String name = "";
 			name = stack.getType().toString();
+			int amt = stack.getAmount();
+			if(amt > 1){
+				name += " §3x " + amt;
+			}
+			return name;
 		}
-		int amt = stack.getAmount();
-		if(amt > 1){
-			name += " §3x " + amt;
-		}
-		return name;
-		
 	}
 	
 	@EventHandler
@@ -282,13 +317,13 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 				if(phase == 1){ //Passage à l'éditeur de résultat
 					ArrayList<ItemStack> globalcraft = craft.get(player).get("craft");
 					if(!globalcraft.isEmpty()){
-						player.sendMessage("§d§l➤ Result of the craft");
+						player.sendMessage("§d§l➤ Making the craft rewards");
 						player.sendMessage("§eSelect items in your §d§omain§d hand§e "
 								+ "and write §2§ladd§e on chat.");
 						player.sendMessage("§f§l§m-----");
 						player.sendMessage("§7Write §oexit§7 to leave this editor.");
 						player.sendMessage("§7Write §cremovelast§7 to remove the last item you added.");
-						player.sendMessage("§eWrite §2next§e to go to next step.");
+						player.sendMessage("§eWrite §2next§e to go to the next step.");
 						player.sendMessage("§d§l§m-----");
 						player.sendMessage("§aCraft contents :§r " + getCraftRecap(craft.get(player)));
 						editor.put(player, 2);
@@ -298,7 +333,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 				} else if(phase == 2){ //Enregistrement
 					ArrayList<ItemStack> globalcraft = craft.get(player).get("craft");
 					if(!globalcraft.isEmpty()){
-						player.sendMessage("§a§l➤ Craft terminé et enregistré. ;)");
+						player.sendMessage("§a§l➤ Craft finished and saved. ;)");
 						player.sendMessage("§eCraft created :§r " + getCraftRecap(craft.get(player)));
 						addCraft(craft.get(player));
 						craft.remove(player);
@@ -313,7 +348,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 				player.sendMessage("§bWrite §2§ladd§b to add items.");
 				player.sendMessage("§7Write §oexit§7 to leave this editor.");
 				player.sendMessage("§7Write §cremovelast§7 to remove the last item you added.");
-				player.sendMessage("§eWrite §2next§e to go to next step.");
+				player.sendMessage("§eWrite §2next§e to go to the next step.");
 				player.sendMessage("§7§l§m-----");
 			}
 		}
@@ -378,6 +413,8 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable(){
 				@SuppressWarnings({ "unchecked", "deprecation" })
 				public void run(){
+					if(!caulLoc.containsKey(player))
+						return;
 					//Suppression des valeurs.
 					clearVar(player);
 					ArrayList<Item> itemsInCaul = inCaul.get(player);
