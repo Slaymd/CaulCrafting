@@ -282,7 +282,8 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 					}
 					player.sendMessage("§b§lCaulCrafting v" + getDescription().getVersion() + " §bby Slaymd.");
 					player.sendMessage("§7§l§m-----");
-					player.sendMessage("§e/caulcrafting §2create §7§oCreate a new craft");
+					player.sendMessage("§e/caulcrafting §2create §7§oMake a new craft (easy)");
+					player.sendMessage("§e§o/caulcrafting §2§ocreate §b§o<craft> <result> §7§oMake a new craft (fast)");
 					player.sendMessage("§e/caulcrafting §blist §7§oList of crafts");
 					player.sendMessage("§e/caulcrafting §cremove <nb> §7§oRemove a specified craft");
 					player.sendMessage("§7§l§m-----");
