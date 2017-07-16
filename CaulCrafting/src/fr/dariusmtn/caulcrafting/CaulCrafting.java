@@ -1,6 +1,7 @@
 package fr.dariusmtn.caulcrafting;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -70,7 +71,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	HashMap<Player,Integer> editor = new HashMap<Player,Integer>();
 	HashMap<Player,HashMap<String,ArrayList<ItemStack>>> craft = new HashMap<Player,HashMap<String,ArrayList<ItemStack>>>();
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(cmd.getName().equalsIgnoreCase("caulcrafting")){
@@ -83,26 +84,124 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 					if(args.length > 0){
 						if(args[0].equalsIgnoreCase("create")){
 							//CRÉATION DE CRAFT
-							if(!editor.containsKey(player)){
-								//Listes éditeur
-								editor.put(player, 1);
-								HashMap<String,ArrayList<ItemStack>> init = new HashMap<String,ArrayList<ItemStack>>();
-								init.put("craft", new ArrayList<ItemStack>());
-								init.put("result", new ArrayList<ItemStack>());
-								craft.put(player, init);
-								//Explications
-								player.sendMessage("§d§l➤ Making a new craft");
-								player.sendMessage("§eSelect items in your §d§omain§d hand§e "
-										+ "and write §2§ladd§e on chat.");
-								player.sendMessage("§f§l§m-----");
-								player.sendMessage("§7Write §oexit§7 to leave this editor.");
-								player.sendMessage("§7Write §cremovelast§7 to remove the last item you added.");
-								player.sendMessage("§eWrite §2next§e to go to the next step.");
-								player.sendMessage("§d§l§m-----");
-								return true;
+							if(args.length > 1){
+								if(args.length == 3){
+									if(!editor.containsKey(player)){
+										HashMap<String,ArrayList<ItemStack>> craftcmd = new HashMap<String,ArrayList<ItemStack>>();
+										//On converti en ItemStack
+										boolean error = false;
+										for(int i = 1; i <= 2; i++){
+											ArrayList<String> part = new ArrayList<String>();
+											if(i == 1){
+												//Craft
+												part = new ArrayList<String>(Arrays.asList(args[1].split(",")));
+											} else if(i == 2){
+												//Result
+												part = new ArrayList<String>(Arrays.asList(args[2].split(",")));
+											}
+											for(String eitm : part){
+												if(error == false){
+													ItemStack itms = null;
+													//Détection du nombre
+													int amount = 1;
+													if(eitm.contains("*")){
+														try{
+															amount = Integer.parseInt(eitm.substring(eitm.indexOf("*")+1, eitm.length()));
+														} catch (Exception e){
+															//...
+														}
+													}
+													eitm = eitm.replace("*" + amount, "");
+													//ID avec Data
+													if(eitm.contains(":")){
+														ArrayList<String> idastr = new ArrayList<String>(Arrays.asList(eitm.split(":")));
+														try{
+															itms = new ItemStack(Material.getMaterial(Integer.parseInt(idastr.get(0))),amount);
+															itms.setDurability(Short.parseShort(idastr.get(1)));
+														} catch (Exception e){
+															try{
+																itms = new ItemStack(Material.getMaterial(idastr.get(0).toUpperCase()),amount);
+																itms.setDurability(Short.parseShort(idastr.get(1)));
+															} catch (Exception ee){
+																//...
+															}
+														}
+													} else {
+														try{
+															if(Integer.parseInt(eitm) >= 0){
+																itms = new ItemStack(Material.getMaterial(Integer.parseInt(eitm)),amount);
+															}
+														} catch (Exception e){
+															try{
+																itms = new ItemStack(Material.getMaterial(eitm.toUpperCase()),amount);
+															} catch (Exception ee){
+																player.sendMessage("§cWrong: " + eitm);
+															}
+														}
+														
+													}
+													if(itms != null){
+														if(i == 1){
+															ArrayList<ItemStack> ccraft = new ArrayList<ItemStack>();
+															if(craftcmd.containsKey("craft"))
+																ccraft = craftcmd.get("craft");
+															ccraft.add(itms);
+															craftcmd.put("craft", ccraft);
+														} else if(i == 2){
+															ArrayList<ItemStack> ccraft = new ArrayList<ItemStack>();
+															if(craftcmd.containsKey("result"))
+																ccraft = craftcmd.get("result");
+															ccraft.add(itms);
+															craftcmd.put("result", ccraft);
+														}
+													} else {
+														error = true;
+													}
+												}
+											}
+										}
+										
+										if(!craftcmd.isEmpty()){
+											if(error == false){
+												player.sendMessage("§d§l➤ That's right ?");
+												player.sendMessage("§bCraft typed :§r " + getCraftRecap(craftcmd));
+												player.sendMessage("§eWrite §2yes§e to confirm and save it or §cno§e to cancel.");
+												editor.put(player, 3);
+												craft.put(player, craftcmd);
+												return true;
+											}
+										}
+									} else {
+										player.sendMessage("§cYou need to confirm the last craft !");
+										player.sendMessage("§7Write §2yes§7 to confirm and save it or §cno§7 to cancel.");
+										return false;
+									}
+								}
+								player.sendMessage("§e/caulcrafting §2create §b<craft>§l*§b <rewards>§l*");
+								player.sendMessage("§b§l* Example: §f264*9,stick §7(9 x DIAMOND + 1 x STICK)");
+								return false;
+							} else {
+								if(!editor.containsKey(player)){
+									//Listes éditeur
+									editor.put(player, 1);
+									HashMap<String,ArrayList<ItemStack>> init = new HashMap<String,ArrayList<ItemStack>>();
+									init.put("craft", new ArrayList<ItemStack>());
+									init.put("result", new ArrayList<ItemStack>());
+									craft.put(player, init);
+									//Explications
+									player.sendMessage("§d§l➤ Making a new craft");
+									player.sendMessage("§eSelect items in your §d§omain§d hand§e "
+											+ "and write §2§ladd§e on chat.");
+									player.sendMessage("§f§l§m-----");
+									player.sendMessage("§7Write §oexit§7 to leave this editor.");
+									player.sendMessage("§7Write §cremovelast§7 to remove the last item you added.");
+									player.sendMessage("§eWrite §2next§e to go to the next step.");
+									player.sendMessage("§d§l§m-----");
+									return true;
+								}
+								player.sendMessage("§cYou're already in the editor! ;)");
+								return false;
 							}
-							player.sendMessage("§cYou're already in the editor! ;)");
-							return false;
 						}
 						else if(args[0].equalsIgnoreCase("list")){
 							//Intervalle d'action (pagination)
@@ -261,95 +360,113 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		//S'il est dans l'éditeur
 		if(editor.containsKey(player)){
 			e.setCancelled(true);
-			String mode = "craft";
-			if(editor.get(player) == 2)
-				mode = "result";
-			//quitter
-			if(msg.equalsIgnoreCase("exit")){
-				editor.remove(player);
-				player.sendMessage("§cEditor left.");
-			}
-			//ajouter un craft
-			else if(msg.equalsIgnoreCase("add")){
-				ItemStack item = player.getInventory().getItemInMainHand();
-				if(item != null){
-					player.sendMessage("§7§l§m-----");
-					//Affichage du nom
-					String name = getName(item);
-					player.sendMessage("§7Item added : §a" + name);
-					//Ajout définitif
-					ArrayList<ItemStack> globalcraft = craft.get(player).get(mode);
-					globalcraft.add(item);
-					HashMap<String,ArrayList<ItemStack>> totalcraft = craft.get(player);
-					totalcraft.put(mode, globalcraft);
-					craft.put(player, totalcraft);
-					//Recap
-					String recap = getCraftRecap(totalcraft);
-					player.sendMessage("§eCraft contents :§r " + recap);
-					//Rappel commandes
-					player.sendMessage("§7§l§m-----");
+			if(editor.get(player) < 3){
+				String mode = "craft";
+				if(editor.get(player) == 2)
+					mode = "result";
+				//quitter
+				if(msg.equalsIgnoreCase("exit")){
+					editor.remove(player);
+					player.sendMessage("§cEditor left.");
 				}
-			}
-			//supprimer le dernier
-			else if(msg.equalsIgnoreCase("removelast")){
-				ArrayList<ItemStack> globalcraft = craft.get(player).get(mode);
-				if(globalcraft != null){
-					ItemStack deleted = globalcraft.get(globalcraft.size()-1);
-					//Supression du dernier item ajouté
-					globalcraft.remove(globalcraft.size()-1);
-					HashMap<String,ArrayList<ItemStack>> totalcraft = craft.get(player);
-					totalcraft.put(mode, globalcraft);
-					craft.put(player, totalcraft);
-					player.sendMessage("§7§l§m-----");
-					//Affichage du nom
-					String name = getName(deleted);
-					player.sendMessage("§7Item removed : §c§m" + name);
-					//Recap
-					String recap = getCraftRecap(totalcraft);
-					player.sendMessage("§eCraft contents :§r " + recap);
-					//Rappel commandes
-					player.sendMessage("§7§l§m-----");
-				}
-			}
-			//passer à l'étape suivante
-			else if(msg.equalsIgnoreCase("next")){
-				Integer phase = editor.get(player);
-				if(phase == 1){ //Passage à l'éditeur de résultat
-					ArrayList<ItemStack> globalcraft = craft.get(player).get("craft");
-					if(!globalcraft.isEmpty()){
-						player.sendMessage("§d§l➤ Making the craft rewards");
-						player.sendMessage("§eSelect items in your §d§omain§d hand§e "
-								+ "and write §2§ladd§e on chat.");
-						player.sendMessage("§f§l§m-----");
-						player.sendMessage("§7Write §oexit§7 to leave this editor.");
-						player.sendMessage("§7Write §cremovelast§7 to remove the last item you added.");
-						player.sendMessage("§eWrite §2next§e to go to the next step.");
-						player.sendMessage("§d§l§m-----");
-						player.sendMessage("§aCraft contents :§r " + getCraftRecap(craft.get(player)));
-						editor.put(player, 2);
-					} else {
-						player.sendMessage("§cAdd items to the §lcraft§c before going to the next step !");
+				//ajouter un craft
+				else if(msg.equalsIgnoreCase("add")){
+					ItemStack item = player.getInventory().getItemInMainHand();
+					if(item != null){
+						player.sendMessage("§7§l§m-----");
+						//Affichage du nom
+						String name = getName(item);
+						player.sendMessage("§7Item added : §a" + name);
+						//Ajout définitif
+						ArrayList<ItemStack> globalcraft = craft.get(player).get(mode);
+						globalcraft.add(item);
+						HashMap<String,ArrayList<ItemStack>> totalcraft = craft.get(player);
+						totalcraft.put(mode, globalcraft);
+						craft.put(player, totalcraft);
+						//Recap
+						String recap = getCraftRecap(totalcraft);
+						player.sendMessage("§eCraft contents :§r " + recap);
+						//Rappel commandes
+						player.sendMessage("§7§l§m-----");
 					}
-				} else if(phase == 2){ //Enregistrement
-					ArrayList<ItemStack> globalcraft = craft.get(player).get("craft");
-					if(!globalcraft.isEmpty()){
+				}
+				//supprimer le dernier
+				else if(msg.equalsIgnoreCase("removelast")){
+					ArrayList<ItemStack> globalcraft = craft.get(player).get(mode);
+					if(globalcraft != null){
+						ItemStack deleted = globalcraft.get(globalcraft.size()-1);
+						//Supression du dernier item ajouté
+						globalcraft.remove(globalcraft.size()-1);
+						HashMap<String,ArrayList<ItemStack>> totalcraft = craft.get(player);
+						totalcraft.put(mode, globalcraft);
+						craft.put(player, totalcraft);
+						player.sendMessage("§7§l§m-----");
+						//Affichage du nom
+						String name = getName(deleted);
+						player.sendMessage("§7Item removed : §c§m" + name);
+						//Recap
+						String recap = getCraftRecap(totalcraft);
+						player.sendMessage("§eCraft contents :§r " + recap);
+						//Rappel commandes
+						player.sendMessage("§7§l§m-----");
+					}
+				}
+				//passer à l'étape suivante
+				else if(msg.equalsIgnoreCase("next")){
+					Integer phase = editor.get(player);
+					if(phase == 1){ //Passage à l'éditeur de résultat
+						ArrayList<ItemStack> globalcraft = craft.get(player).get("craft");
+						if(!globalcraft.isEmpty()){
+							player.sendMessage("§d§l➤ Making the craft rewards");
+							player.sendMessage("§eSelect items in your §d§omain§d hand§e "
+									+ "and write §2§ladd§e on chat.");
+							player.sendMessage("§f§l§m-----");
+							player.sendMessage("§7Write §oexit§7 to leave this editor.");
+							player.sendMessage("§7Write §cremovelast§7 to remove the last item you added.");
+							player.sendMessage("§eWrite §2next§e to go to the next step.");
+							player.sendMessage("§d§l§m-----");
+							player.sendMessage("§aCraft contents :§r " + getCraftRecap(craft.get(player)));
+							editor.put(player, 2);
+						} else {
+							player.sendMessage("§cAdd items to the §lcraft§c before going to the next step !");
+						}
+					} else if(phase == 2){ //Enregistrement
+						ArrayList<ItemStack> globalcraft = craft.get(player).get("craft");
+						if(!globalcraft.isEmpty()){
+							player.sendMessage("§a§l➤ Craft finished and saved. ;)");
+							player.sendMessage("§eCraft created :§r " + getCraftRecap(craft.get(player)));
+							addCraft(craft.get(player));
+							craft.remove(player);
+							editor.remove(player);
+							reloadConfig();
+						} else {
+							player.sendMessage("§cAdd items to §lresult of the craft§c before going to the next step !");
+						}
+					}
+				} else {
+					player.sendMessage("§7§l§m-----");
+					player.sendMessage("§bWrite §2§ladd§b to add items.");
+					player.sendMessage("§7Write §oexit§7 to leave this editor.");
+					player.sendMessage("§7Write §cremovelast§7 to remove the last item you added.");
+					player.sendMessage("§eWrite §2next§e to go to the next step.");
+					player.sendMessage("§7§l§m-----");
+				}
+			} else {
+				if(editor.get(player) == 3){
+					//Craft entré via commande, demande de confirmation
+					if(msg.equalsIgnoreCase("yes")){
 						player.sendMessage("§a§l➤ Craft finished and saved. ;)");
 						player.sendMessage("§eCraft created :§r " + getCraftRecap(craft.get(player)));
 						addCraft(craft.get(player));
 						craft.remove(player);
 						editor.remove(player);
 						reloadConfig();
-					} else {
-						player.sendMessage("§cAdd items to §lresult of the craft§c before going to the next step !");
+					} else if(msg.equalsIgnoreCase("no")){
+						craft.remove(player);
+						editor.remove(player);
+						player.sendMessage("§cCraft canceled.");
 					}
 				}
-			} else {
-				player.sendMessage("§7§l§m-----");
-				player.sendMessage("§bWrite §2§ladd§b to add items.");
-				player.sendMessage("§7Write §oexit§7 to leave this editor.");
-				player.sendMessage("§7Write §cremovelast§7 to remove the last item you added.");
-				player.sendMessage("§eWrite §2next§e to go to the next step.");
-				player.sendMessage("§7§l§m-----");
 			}
 		}
 		
