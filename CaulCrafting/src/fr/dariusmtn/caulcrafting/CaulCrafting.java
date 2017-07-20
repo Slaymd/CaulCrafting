@@ -31,6 +31,7 @@ import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_12_R1;
 
 public class CaulCrafting extends JavaPlugin implements Listener {
 	
+	@SuppressWarnings("unused")
 	public void onEnable(){
 		Bukkit.getPluginManager().registerEvents(this, this);
 		saveDefaultConfig();
@@ -41,7 +42,9 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 			getLogger().severe("Check CaulCrafting updates !");
 			nmsItemsName = false;
 		}
-	}
+		//Stats (bstats) https://bstats.org/plugin/bukkit/CaulCrafting
+		MetricsLite metrics = new MetricsLite(this);
+	} 
 	
 	static Itemsname itemsname = null;
 	static boolean nmsItemsName = false;
@@ -75,14 +78,13 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(cmd.getName().equalsIgnoreCase("caulcrafting")){
-			//Joueur OP
-			if(sender.isOp()){
-				//Joueur réel
-				if(sender instanceof Player){
-					Player player = (Player)sender;
-					//Sous commandes
-					if(args.length > 0){
-						if(args[0].equalsIgnoreCase("create")){
+			//Joueur réel
+			if(sender instanceof Player){
+				Player player = (Player)sender;
+				//Sous commandes
+				if(args.length > 0){
+					if(args[0].equalsIgnoreCase("create")){
+						if(player.hasPermission("caulcrafting.admin.create")){
 							//CRÉATION DE CRAFT
 							if(args.length > 1){
 								if(args.length == 3){
@@ -203,7 +205,11 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 								return false;
 							}
 						}
-						else if(args[0].equalsIgnoreCase("list")){
+						player.sendMessage("§cSorry! You don't have permission to do that :(");
+						return false;
+					}
+					else if(args[0].equalsIgnoreCase("list")){
+						if(player.hasPermission("caulcrafting.admin.list")) {
 							//Intervalle d'action (pagination)
 							int page = 0;
 							if(args.length > 1){
@@ -244,7 +250,11 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 							}
 							return true;
 						}
-						else if(args[0].equalsIgnoreCase("remove")){
+						player.sendMessage("§cSorry! You don't have permission to do that :(");
+						return false;
+					}
+					else if(args[0].equalsIgnoreCase("remove")){
+						if(player.hasPermission("caulcrafting.admin.remove")) {
 							//Numéro du craft
 							int nb = -1;
 							if(args.length > 1){
@@ -279,20 +289,20 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 							player.sendMessage("§cInvalid craft number! §o(maybe check §4§o/caulcrafting list§c§o ?)");
 							return true;
 						}
+						player.sendMessage("§cSorry! You don't have permission to do that :(");
+						return false;
 					}
-					player.sendMessage("§b§lCaulCrafting v" + getDescription().getVersion() + " §bby Slaymd.");
-					player.sendMessage("§7§l§m-----");
-					player.sendMessage("§e/caulcrafting §2create §7§oMake a new craft (easy)");
-					player.sendMessage("§e§o/caulcrafting §2§ocreate §b§o<craft> <result> §7§oMake a new craft (fast)");
-					player.sendMessage("§e/caulcrafting §blist §7§oList of crafts");
-					player.sendMessage("§e/caulcrafting §cremove <nb> §7§oRemove a specified craft");
-					player.sendMessage("§7§l§m-----");
-					return false;
 				}
-				sender.sendMessage("§cAre you a robot? Oo Sorry but you need to be connected! ;)");
+				player.sendMessage("§b§lCaulCrafting v" + getDescription().getVersion() + " §bby Slaymd.");
+				player.sendMessage("§7§l§m-----");
+				player.sendMessage("§e/caulcrafting §2create §7§oMake a new craft (easy)");
+				player.sendMessage("§e§o/caulcrafting §2§ocreate §b§o<craft> <result> §7§oMake a new craft (fast)");
+				player.sendMessage("§e/caulcrafting §blist §7§oList of crafts");
+				player.sendMessage("§e/caulcrafting §cremove <nb> §7§oRemove a specified craft");
+				player.sendMessage("§7§l§m-----");
 				return false;
 			}
-			sender.sendMessage("§cYou need to be OP! :(");
+			sender.sendMessage("§cAre you a robot? Oo Sorry but you need to be connected! ;)");
 			return false;
 		}
 		return false;
@@ -504,23 +514,25 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 				if(item.isOnGround()){
 					//Si l'item est dans un chadron
 					if(itemLoc.getBlock().getType() == Material.CAULDRON){
-						Block caul = itemLoc.getBlock();
-						if(!caulLoc.containsKey(player))
-							caulLoc.put(player, caul.getLocation());
-						//Si le chaudron contient de l'eau
-						if(caul.getData() > 0){
-							//Particule dans le chadron
-							for(int ii = 0; ii<100;ii++){
-								player.getWorld().playEffect(itemLoc, Effect.POTION_SWIRL, 1);
+						if(player.hasPermission("caulcrafting.use")) {
+							Block caul = itemLoc.getBlock();
+							if(!caulLoc.containsKey(player))
+								caulLoc.put(player, caul.getLocation());
+							//Si le chaudron contient de l'eau
+							if(caul.getData() > 0){
+								//Particule dans le chadron
+								for(int ii = 0; ii<100;ii++){
+									player.getWorld().playEffect(itemLoc, Effect.POTION_SWIRL, 1);
+								}
+								//Son
+								player.getWorld().playSound(player.getLocation(),Sound.BLOCK_BREWING_STAND_BREW,1, 0);
+								//Ajout dans la liste du chaudron
+								ArrayList<Item> itemToAdd = new ArrayList<Item>();
+								if(inCaul.containsKey(player))
+									itemToAdd = inCaul.get(player);
+								itemToAdd.add(item);
+								inCaul.put(player, itemToAdd);
 							}
-							//Son
-							player.getWorld().playSound(player.getLocation(),Sound.BLOCK_BREWING_STAND_BREW,1, 0);
-							//Ajout dans la liste du chaudron
-							ArrayList<Item> itemToAdd = new ArrayList<Item>();
-							if(inCaul.containsKey(player))
-								itemToAdd = inCaul.get(player);
-							itemToAdd.add(item);
-							inCaul.put(player, itemToAdd);
 						}
 					}
 				}
@@ -592,9 +604,12 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 								player.getWorld().playEffect(cauldronlocation, Effect.FIREWORKS_SPARK, 1);
 							}
 							player.getWorld().playSound(player.getLocation(),Sound.ENTITY_PLAYER_LEVELUP,1, 0);
-							Block caul = caulLoc.get(player).getBlock();
-							byte caulData = caul.getData();
-							caul.setData((byte) (caulData-1));
+							//Water layer
+							if(!player.hasPermission("caulcrafting.nowaterconsume")) {
+								Block caul = caulLoc.get(player).getBlock();
+								byte caulData = caul.getData();
+								caul.setData((byte) (caulData-1));
+							}
 						} else {
 							//Craft invalide
 							player.getWorld().playSound(player.getLocation(),Sound.ITEM_BOTTLE_FILL_DRAGONBREATH,1, 0);
