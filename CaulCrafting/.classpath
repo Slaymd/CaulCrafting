@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/Darius/OneDrive/Code/Java/_API/1.12/spigot-1.12.jar"/>
-	<classpathentry kind="lib" path="/Users/Darius/OneDrive/Code/Java/_API/API 1.11/Spigot-1.11.2.jar"/>
-	<classpathentry kind="lib" path="/Users/Darius/OneDrive/Code/Java/_API/API 1.10/Spigot 1.10.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Darius/OneDrive/Code/Java/_API/API 1.10/Spigot 1.10.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Darius/OneDrive/Code/Java/_API/API 1.11/Spigot-1.11.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Darius/OneDrive/Code/Java/_API/1.12/spigot-1.12.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

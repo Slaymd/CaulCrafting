@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -28,6 +28,7 @@ import fr.dariusmtn.caulcrafting.itemsname.Itemsname;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_10_R1;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_11_R1;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_12_R1;
+import net.md_5.bungee.api.ChatColor;
 
 public class CaulCrafting extends JavaPlugin implements Listener {
 	
@@ -275,7 +276,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 								}
 								if(craftlist.size()-1 >= nb){
 									HashMap<String, ArrayList<ItemStack>> specraft = craftlist.get(nb);
-									player.sendMessage("§7Removed craft: §c§m" + getCraftRecap(specraft));
+									player.sendMessage("§7Removed craft: §c§m" + ChatColor.stripColor(getCraftRecap(specraft)));
 									//On supprime
 									craftlist.remove(nb);
 									//Met à jour sur la config
@@ -300,6 +301,8 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 				player.sendMessage("§e/caulcrafting §blist §7§oList of crafts");
 				player.sendMessage("§e/caulcrafting §cremove <nb> §7§oRemove a specified craft");
 				player.sendMessage("§7§l§m-----");
+				player.sendMessage("§d§lNEED SUPPORT ? §eCome on §nDiscord§e :D");
+				player.sendMessage("§bhttps://discord.gg/w628upr");
 				return false;
 			}
 			sender.sendMessage("§cAre you a robot? Oo Sorry but you need to be connected! ;)");
@@ -521,9 +524,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 							//Si le chaudron contient de l'eau
 							if(caul.getData() > 0){
 								//Particule dans le chadron
-								for(int ii = 0; ii<100;ii++){
-									player.getWorld().playEffect(itemLoc, Effect.POTION_SWIRL, 1);
-								}
+								itemLoc.getWorld().spawnParticle(Particle.SPELL_MOB, itemLoc, 100);
 								//Son
 								player.getWorld().playSound(player.getLocation(),Sound.BLOCK_BREWING_STAND_BREW,1, 0);
 								//Ajout dans la liste du chaudron
@@ -600,9 +601,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 							for(ItemStack itemresult : actualcraft.get("result"))
 								cauldronlocation.getWorld().dropItemNaturally(cauldronlocation.clone().add(0, 1, 0), itemresult);
 							//Effets graphiques
-							for(int ii = 0; ii<100;ii++){
-								player.getWorld().playEffect(cauldronlocation, Effect.FIREWORKS_SPARK, 1);
-							}
+							cauldronlocation.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, cauldronlocation, 40);
 							player.getWorld().playSound(player.getLocation(),Sound.ENTITY_PLAYER_LEVELUP,1, 0);
 							//Water layer
 							if(!player.hasPermission("caulcrafting.nowaterconsume")) {
@@ -613,9 +612,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 						} else {
 							//Craft invalide
 							player.getWorld().playSound(player.getLocation(),Sound.ITEM_BOTTLE_FILL_DRAGONBREATH,1, 0);
-							for(int ii = 0; ii<100;ii++){
-								player.getWorld().playEffect(cauldronlocation, Effect.WITCH_MAGIC, 1);
-							}
+							cauldronlocation.getWorld().spawnParticle(Particle.SPELL_WITCH, cauldronlocation, 100);
 						}
 					}
 				}
