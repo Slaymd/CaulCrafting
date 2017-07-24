@@ -1,7 +1,13 @@
 language: java
-jdk:
-  - openjdk7
-  - oraclejdk7
-  - oraclejdk8
+sudo: false
 notifications:
   email: false
+deploy:
+  provider: releases
+  api-key: ${GITHUB_TOKEN}
+  file:
+  - target/CaulCrafting.jar
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true
