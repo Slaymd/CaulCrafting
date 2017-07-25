@@ -1,11 +1,14 @@
 main: fr.dariusmtn.caulcrafting.CaulCrafting
-version: 2.4
+version: 2.5
 name: CaulCrafting
 author: Slaymd
 commands:
   caulcrafting:
     description: CaulCrafting main command.
     aliases: [cc,cauldroncrafting]
+  caulcraftingconfig:
+    description: CaulCrafting config command.
+    aliases: [c3,ccc]
 permissions:
   caulcrafting.use:
     description: Allows you to use the cauldron crafting system
