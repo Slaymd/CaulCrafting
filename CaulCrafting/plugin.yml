@@ -31,4 +31,4 @@ permissions:
   caulcrafting.admin.remove:
     description: Allows you to remove a specified craft
     default: op
-  
+

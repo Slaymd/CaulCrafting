@@ -35,7 +35,7 @@ public class CraftStorage implements Listener {
     }
     
     public void removeCraft(int nb) {
-    	//List of all crafts
+    	//List of all crafts 
     	ArrayList<HashMap<String,ArrayList<ItemStack>>> craftlist = getCrafts();
 		try {
 			//removing

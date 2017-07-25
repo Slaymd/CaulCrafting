@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 /**
- * Internal class: Represents a component of a JSON-serializable {@link FancyMessage}.
+ * Internal class: Represents a component of a JSON-serializable {@link FancyMessage}. 
  */
 final class MessagePart implements JsonRepresentedObject, ConfigurationSerializable, Cloneable {
 

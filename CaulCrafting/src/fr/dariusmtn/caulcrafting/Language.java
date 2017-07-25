@@ -15,7 +15,7 @@ public class Language implements Listener {
     
 	
 	public String getLanguage() {
-		//Get exact lang
+		//Get exact lang 
 		String loc = getExactLanguage();
 		File file = new File(plugin.getDataFolder(), "/lang/" + loc + ".yml");
 		if(file.exists()) {

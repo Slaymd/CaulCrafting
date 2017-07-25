@@ -39,7 +39,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	public CraftStorage craftStorage = new CraftStorage(this);
 	public CraftFormatting craftFormat = new CraftFormatting(this);
 	
-	//Languages availables list
+	//Languages availables list 
 	HashMap<String, String> languagesAvailable = new HashMap<String,String>();
 	
 	@SuppressWarnings({ "unused" })

@@ -23,7 +23,7 @@ public class ConfigUpdate implements Listener {
 		//Màj config V1
 		if(!plugin.getConfig().isSet("config_version")) {
 			plugin.getLogger().info("CaulCrafting config has changed : trying to convert...");
-			//Getting whole crafts
+			//Getting whole crafts 
 			ArrayList<HashMap<String,ArrayList<ItemStack>>> craftlist = new ArrayList<HashMap<String,ArrayList<ItemStack>>>();
 			if(plugin.getConfig().isSet("Crafts"))
 				craftlist = (ArrayList<HashMap<String, ArrayList<ItemStack>>>) plugin.getConfig().get("Crafts");

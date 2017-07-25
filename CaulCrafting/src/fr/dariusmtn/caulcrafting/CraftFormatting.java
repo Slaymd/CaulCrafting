@@ -27,7 +27,7 @@ public class CraftFormatting implements Listener {
 		} else {
 			reNeed = "§7§o" + plugin.lang.getTranslation("general_undefined");
 		}
-		//Elements donnés
+		//Elements donnés 
 		String reResult = "";
 		if(!result.isEmpty()){
 			for(ItemStack item : result){

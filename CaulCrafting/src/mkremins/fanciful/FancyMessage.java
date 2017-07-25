@@ -32,7 +32,7 @@ import static mkremins.fanciful.TextualComponent.rawText;
  * It is set up such that invocations of property-setting methods will affect the current editing component,
  * and a call to {@link #then()} or {@link #then(String)} will append a new editing component to the end of the message,
  * optionally initializing it with text. Further property-setting method calls will affect that editing component.
- * </p>
+ * </p> 
  */
 public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<MessagePart>, ConfigurationSerializable {
 

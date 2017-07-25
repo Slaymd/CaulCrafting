@@ -19,7 +19,7 @@ public class Config implements Listener {
 	private void addDefault(String mainpath, String name, boolean replace) {
 		//update file
 		plugin.saveResource(name + ".yml", replace);
-		//File move (source mkyong.com)
+		//File move (source mkyong.com) 
 		InputStream inStream = null;
 		OutputStream outStream = null;
 		try {

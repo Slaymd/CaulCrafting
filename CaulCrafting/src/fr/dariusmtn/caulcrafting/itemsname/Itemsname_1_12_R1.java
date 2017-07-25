@@ -4,7 +4,7 @@ import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 public class Itemsname_1_12_R1 implements Itemsname{
-	
+	 
 	@Override
 	public String getItemStackName(ItemStack stack){
 		String name = "";

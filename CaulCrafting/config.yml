@@ -1,4 +1,4 @@
-#Config version, it's only serve to convert with a config update in the future <3
+#Config version, it's only serve to convert with a config update in the future <3 
 config_version: 2
 
 #Display all the plugin actions on logs
