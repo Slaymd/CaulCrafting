@@ -10,9 +10,9 @@
     <property name="source" value="1.8"/>
     <path id="CaulCrafting.classpath">
         <pathelement location="bin"/> 
-        <pathelement location="spigotjar/Spigot 1.10.jar"/>
-        <pathelement location="spigotjar/Spigot-1.11.2.jar"/>
-        <pathelement location="spigotjar/spigot-1.12.jar"/>
+        <pathelement location="http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.11.2.jar"/>
+        <pathelement location="http://dariusmtn.fr/caulcrafting/spigotjar/Spigot 1.10.jar"/>
+        <pathelement location="http://dariusmtn.fr/caulcrafting/spigotjar/spigot-1.12.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
