@@ -484,7 +484,6 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		
 	}
 	
-	HashMap<Player,ArrayList<Item>> inCaul = new HashMap<Player,ArrayList<Item>>();
 	ArrayList<Player> craftProc = new ArrayList<Player>();
 	HashMap<Player,Location> caulLoc = new HashMap<Player,Location>();
 	HashMap<Player,ArrayList<ItemStack>> inCaulFin = new HashMap<Player,ArrayList<ItemStack>>();
@@ -550,20 +549,12 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 								caulLoc.put(player, caul.getLocation());
 							//Si le chaudron contient de l'eau
 							if(caul.getData() > 0){
-								sendDebug(player,"STEP1 a/d - detecting dropping into cauldron " + item.getType());
+								sendDebug(player,"STEP1 a/b - detecting dropping into cauldron " + item.getItemStack().getType());
 								//Particule dans le chadron
-								sendDebug(player,"STEP1 b/d - sending particle and sound");
+								sendDebug(player,"STEP1 b/b - sending particle and sound");
 								itemLoc.getWorld().spawnParticle(Particle.SPELL_MOB, itemLoc, 100);
 								//Son
 								player.getWorld().playSound(player.getLocation(),Sound.BLOCK_BREWING_STAND_BREW,1, 0);
-								sendDebug(player,"STEP1 c/d - adding into temporary storage");
-								//Ajout dans la liste du chaudron
-								ArrayList<Item> itemToAdd = new ArrayList<Item>();
-								if(inCaul.containsKey(player))
-									itemToAdd = inCaul.get(player);
-								itemToAdd.add(item);
-								inCaul.put(player, itemToAdd);
-								sendDebug(player,"STEP1 d/d item add succeed");
 							}
 						}
 					}
@@ -579,7 +570,6 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 						return;
 					//Suppression des valeurs.
 					clearVar(player);
-					ArrayList<Item> itemsInCaul = inCaul.get(player);
 					int count = 0;
 					sendDebug(player,"STEP2 a/c - verifying cauldron content...");
 					for(Entity entIn : caulLoc.get(player).getChunk().getEntities()){
@@ -597,65 +587,62 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 							}
 						}
 					}
-					
 					//On éxécute le craft
-					if(count == itemsInCaul.size()) {
-						sendDebug(player,"STEP2 c/c - cauldron content ok");
-						//On récup tous les crafts
-						ArrayList<HashMap<String,ArrayList<ItemStack>>> allcrafts = craftStorage.getCrafts();
-						//Un par un on voit s'ils correspondent
-						HashMap<String,ArrayList<ItemStack>> actualcraft = new HashMap<String,ArrayList<ItemStack>>();
-						boolean stop = false;
-						sendDebug(player,"STEP3 a/a - checking the craft");
-						for(HashMap<String,ArrayList<ItemStack>> ecraft : allcrafts){
-							if(stop == false){
-								ArrayList<ItemStack> need = ecraft.get("craft");
-								ArrayList<ItemStack> droped = inCaulFin.get(player);
-								actualcraft = ecraft;
-								//S'ils sont similaires on arrête la boucle
-								if(droped.containsAll(need)){
-									stop = true;
-									sendDebug(player,"STEP4a a/d - craft detected : " + ecraft.toString());
+					sendDebug(player,"STEP2 c/c - cauldron content ok (" + count + " items)");
+					//On récup tous les crafts
+					ArrayList<HashMap<String,ArrayList<ItemStack>>> allcrafts = craftStorage.getCrafts();
+					//Un par un on voit s'ils correspondent
+					HashMap<String,ArrayList<ItemStack>> actualcraft = new HashMap<String,ArrayList<ItemStack>>();
+					boolean stop = false;
+					sendDebug(player,"STEP3 a/a - checking the craft");
+					for(HashMap<String,ArrayList<ItemStack>> ecraft : allcrafts){
+						if(stop == false){
+							ArrayList<ItemStack> need = ecraft.get("craft");
+							ArrayList<ItemStack> droped = inCaulFin.get(player);
+							actualcraft = ecraft;
+							//S'ils sont similaires on arrête la boucle
+							if(droped.containsAll(need)){
+								stop = true;
+								sendDebug(player,"STEP4a a/d - craft detected : " + ecraft.toString());
+							}
+						}
+					}
+					//Centre du cauldron
+					Location cauldronlocation = caulLoc.get(player).add(0.5, 0, 0.5);
+					if(stop == true){
+						sendDebug(player,"STEP4a b/d - removing cauldrons items (into)");
+						//Craft valide
+						//On supprime les items dans le chaudron
+						for(Entity ent : getNearbyEntities(cauldronlocation,1)){
+							if(ent instanceof Item){
+								Item itm = (Item)ent;
+								if(actualcraft.get("craft").contains(itm.getItemStack())){
+									ent.remove();
 								}
 							}
 						}
-						//Centre du cauldron
-						Location cauldronlocation = caulLoc.get(player).add(0.5, 0, 0.5);
-						if(stop == true){
-							sendDebug(player,"STEP4a b/d - removing cauldrons items (into)");
-							//Craft valide
-							//On supprime les items dans le chaudron
-							for(Entity ent : getNearbyEntities(cauldronlocation,1)){
-								if(ent instanceof Item){
-									Item itm = (Item)ent;
-									if(actualcraft.get("craft").contains(itm.getItemStack())){
-										ent.remove();
-									}
-								}
-							}
-							sendDebug(player,"STEP4a c/d - sending rewards");
-							//Craft reward
-							for(ItemStack itemresult : actualcraft.get("result"))
-								cauldronlocation.getWorld().dropItemNaturally(cauldronlocation.clone().add(0, 1, 0), itemresult);
-							//Particles
-							sendDebug(player,"STEP4a d/d - sending particles");
-							cauldronlocation.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, cauldronlocation, 40);
-							player.getWorld().playSound(player.getLocation(),Sound.ENTITY_PLAYER_LEVELUP,1, 0);
-							//Water layer
-							if(!player.hasPermission("caulcrafting.nowaterconsume")) {
-								sendDebug(player,"STEP4a* a/a - modifying water layers");
-								Block caul = caulLoc.get(player).getBlock();
-								byte caulData = caul.getData();
-								caul.setData((byte) (caulData-1));
-							}
-						} else {
-							//Craft invalide
-							sendDebug(player,"STEP4b a/b - detecting wrong process");
-							player.getWorld().playSound(player.getLocation(),Sound.ITEM_BOTTLE_FILL_DRAGONBREATH,1, 0);
-							cauldronlocation.getWorld().spawnParticle(Particle.SPELL_WITCH, cauldronlocation, 100);
-							sendDebug(player,"STEP4b b/b - wrong process succeed");
-							
+						sendDebug(player,"STEP4a c/d - sending rewards");
+						//Craft reward
+						for(ItemStack itemresult : actualcraft.get("result"))
+							cauldronlocation.getWorld().dropItemNaturally(cauldronlocation.clone().add(0, 1, 0), itemresult);
+						//Particles
+						sendDebug(player,"STEP4a d/d - sending particles");
+						cauldronlocation.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, cauldronlocation, 40);
+						player.getWorld().playSound(player.getLocation(),Sound.ENTITY_PLAYER_LEVELUP,1, 0);
+						//Water layer
+						if(!player.hasPermission("caulcrafting.nowaterconsume")) {
+							sendDebug(player,"STEP4a* a/a - modifying water layers");
+							Block caul = caulLoc.get(player).getBlock();
+							byte caulData = caul.getData();
+							caul.setData((byte) (caulData-1));
 						}
+					} else {
+						//Craft invalide
+						sendDebug(player,"STEP4b a/b - detecting wrong process");
+						player.getWorld().playSound(player.getLocation(),Sound.ITEM_BOTTLE_FILL_DRAGONBREATH,1, 0);
+						cauldronlocation.getWorld().spawnParticle(Particle.SPELL_WITCH, cauldronlocation, 100);
+						sendDebug(player,"STEP4b b/b - wrong process succeed");
+						
 					}
 				}
 			},100);
@@ -672,7 +659,6 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		 Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable(){
 			 public void run(){
 				 sendDebug(player,"STEP5 a/b - starting removing vars");
-				 inCaul.remove(player);
 				 craftProc.remove(player);
 				 caulLoc.remove(player);
 				 inCaulFin.remove(player);

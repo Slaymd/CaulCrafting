@@ -51,7 +51,9 @@ public class Config implements Listener {
 			
 		}
 		//Locale config
-		plugin.saveResource("config_locale.yml", false);
+		File dfile = new File(plugin.getDataFolder(),"config_locale.yml");
+		if(!dfile.exists())
+			plugin.saveResource("config_locale.yml", false);
 		
 	}
 	
