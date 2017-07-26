@@ -636,7 +636,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 							byte caulData = caul.getData();
 							caul.setData((byte) (caulData-1));
 						}
-					} else { 
+					} else {
 						//Craft invalide
 						sendDebug(player,"STEP4b a/b - detecting wrong process");
 						player.getWorld().playSound(player.getLocation(),Sound.ITEM_BOTTLE_FILL_DRAGONBREATH,1, 0);

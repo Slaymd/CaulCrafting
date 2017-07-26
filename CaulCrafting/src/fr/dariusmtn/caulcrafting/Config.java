@@ -38,7 +38,7 @@ public class Config implements Listener {
     	    outStream.close();
     	    //delete the original file
     	    dfile.delete();
-    	}catch(IOException e){ 
+    	}catch(IOException e){
     	    e.printStackTrace();
     	}
 	    
