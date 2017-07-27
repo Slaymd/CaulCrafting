@@ -48,6 +48,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		//Setup languages
 		languagesAvailable.put("en", "English");
 		languagesAvailable.put("fr", "Français");
+		languagesAvailable.put("ru", "Русский");
 		//Defaults configs files (locales..)
 		configUtils.setupDefaults();
 		//Load defaults configs if empty
