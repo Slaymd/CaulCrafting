@@ -3,6 +3,7 @@ package fr.dariusmtn.caulcrafting;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -17,26 +18,41 @@ public class CraftStorage implements Listener {
     }
     
     @SuppressWarnings("unchecked")
-	public ArrayList<HashMap<String,ArrayList<ItemStack>>> getCrafts(){
-    	ArrayList<HashMap<String,ArrayList<ItemStack>>> craftlist = new ArrayList<HashMap<String,ArrayList<ItemStack>>>();
+	public ArrayList<CraftArray> getCrafts(){
+    	ArrayList<CraftArray> craftlist = new ArrayList<CraftArray>();
     	try {
 	    	File craftfile = new File(plugin.getDataFolder(), "crafts.yml");
 			craftfile.createNewFile();
 			FileConfiguration craftconfig = YamlConfiguration.loadConfiguration(craftfile);
 			if(craftconfig.isSet("Crafts")) {
-				craftlist = (ArrayList<HashMap<String, ArrayList<ItemStack>>>) craftconfig.get("Crafts");
+				for(String craftpath : craftconfig.getConfigurationSection("Crafts").getKeys(false)) {
+					craftpath = "Crafts." + craftpath;
+					ArrayList<ItemStack> config_craft = (ArrayList<ItemStack>) craftconfig.getList(craftpath + ".craft");
+					ArrayList<ItemStack> config_resultitems = (ArrayList<ItemStack>) craftconfig.getList(craftpath + ".result.items");
+					ArrayList<Integer> config_resultprobs = (ArrayList<Integer>) craftconfig.getIntegerList(craftpath + ".result.probs");
+					HashMap<ItemStack,Integer> config_result = new HashMap<ItemStack, Integer>();
+					for(ItemStack resultitem : config_resultitems) {
+						config_result.put(resultitem, config_resultprobs.get(config_resultitems.indexOf(resultitem)));
+					}
+					ArrayList<String> config_cmds = (ArrayList<String>) craftconfig.getStringList(craftpath + ".cmds");
+					boolean config_redstonepower = craftconfig.getBoolean(craftpath + ".redstonepower");
+					int config_experience = craftconfig.getInt(craftpath + ".experience");
+					CraftArray specraft = new CraftArray(config_craft, config_result, config_cmds, config_redstonepower, config_experience);
+					craftlist.add(specraft);
+				}
 				return craftlist;
 			} else {
-				return new ArrayList<HashMap<String,ArrayList<ItemStack>>>();
+				return craftlist;
 			}
     	} catch (Exception e) {
-    		return new ArrayList<HashMap<String,ArrayList<ItemStack>>>();
+    		e.printStackTrace();
+    		return craftlist;
     	}
     }
     
     public void removeCraft(int nb) {
     	//List of all crafts 
-    	ArrayList<HashMap<String,ArrayList<ItemStack>>> craftlist = getCrafts();
+    	ArrayList<CraftArray> craftlist = getCrafts();
 		try {
 			//removing
 			craftlist.remove(nb);
@@ -51,16 +67,12 @@ public class CraftStorage implements Listener {
     	}
     }
     
-	public void addCraft(HashMap<String,ArrayList<ItemStack>> globalcraft){
-		//Récupère la liste totale des crafts
-    	ArrayList<HashMap<String,ArrayList<ItemStack>>> craftlist = getCrafts();
-		//Ajoute à la liste
-		craftlist.add(globalcraft);
+	public void addCraft(CraftArray globalcraft){
 		try {
 	    	File craftfile = new File(plugin.getDataFolder(), "crafts.yml");
 			craftfile.createNewFile();
 			FileConfiguration craftconfig = YamlConfiguration.loadConfiguration(craftfile);
-			craftconfig.set("Crafts", craftlist);
+			craftconfig.set("Crafts." + UUID.randomUUID(), globalcraft.serialize());
 			craftconfig.save(craftfile);
     	} catch (Exception e) {
     		//

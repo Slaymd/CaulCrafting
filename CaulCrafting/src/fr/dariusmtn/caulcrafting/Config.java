@@ -16,16 +16,16 @@ public class Config implements Listener {
           this.plugin = instance; 
     }
 	
-	private void addDefault(String mainpath, String name, boolean replace) {
+	private void addDefault(String mainpath, String name, boolean replace, String extension) {
 		//update file
-		plugin.saveResource(name + ".yml", replace);
+		plugin.saveResource(name + extension, replace);
 		//File move (source mkyong.com) 
 		InputStream inStream = null;
 		OutputStream outStream = null;
 		try {
-			File dfile = new File(plugin.getDataFolder(),name + ".yml");
+			File dfile = new File(plugin.getDataFolder(),name + extension);
 			new File(plugin.getDataFolder(),mainpath).mkdir();
-			File ffile = new File(plugin.getDataFolder(),mainpath + name + ".yml");
+			File ffile = new File(plugin.getDataFolder(),mainpath + name + extension);
 			inStream = new FileInputStream(dfile);
     	    outStream = new FileOutputStream(ffile);
     	    byte[] buffer = new byte[1024];
@@ -47,7 +47,7 @@ public class Config implements Listener {
 	public void setupDefaults() {
 		//languages
 		for(String loc : plugin.languagesAvailable.keySet()) {
-			this.addDefault("/lang/", loc, true);
+			this.addDefault("/lang/", loc, true, ".properties");
 			
 		}
 		//Locale config
@@ -56,6 +56,5 @@ public class Config implements Listener {
 			plugin.saveResource("config_locale.yml", false);
 		
 	}
-	
 	
 }

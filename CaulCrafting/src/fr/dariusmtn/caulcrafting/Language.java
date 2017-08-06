@@ -1,6 +1,9 @@
 package fr.dariusmtn.caulcrafting;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Properties;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -17,7 +20,7 @@ public class Language implements Listener {
 	public String getLanguage() {
 		//Get exact lang 
 		String loc = getExactLanguage();
-		File file = new File(plugin.getDataFolder(), "/lang/" + loc + ".yml");
+		File file = new File(plugin.getDataFolder(), "/lang/" + loc + ".properties");
 		if(file.exists()) {
 			return loc;
 		} else {
@@ -51,15 +54,21 @@ public class Language implements Listener {
 	public String getTranslation(String code, String locale) {
 		String transl = code;
 		try {
-			File locfile = new File(plugin.getDataFolder() + "/lang/" + locale + ".yml");
-			FileConfiguration locconfig = YamlConfiguration.loadConfiguration(locfile);
-			transl = locconfig.getString(code.toLowerCase());
+			File locfile = new File(plugin.getDataFolder() + "/lang/" + locale + ".properties");
+			InputStream locStream = new FileInputStream(locfile);
+			Properties locprop = new Properties();
+			locprop.load(locStream);
+			transl = locprop.getProperty(code.toLowerCase());
+			locStream.close();
 			return transl.replaceAll("&", "§");
 		} catch (Exception e) {
 			try {
-				File locfile = new File(plugin.getDataFolder() + "/lang/en.yml");
-				FileConfiguration locconfig = YamlConfiguration.loadConfiguration(locfile);
-				transl = locconfig.getString(code.toLowerCase());
+				File locfile = new File(plugin.getDataFolder() + "/lang/en.properties");
+				InputStream locStream = new FileInputStream(locfile);
+				Properties locprop = new Properties();
+				locprop.load(locStream);
+				transl = locprop.getProperty(code.toLowerCase());
+				locStream.close();
 				return transl.replaceAll("&", "§");
 			} catch (Exception ee) {
 				return code;

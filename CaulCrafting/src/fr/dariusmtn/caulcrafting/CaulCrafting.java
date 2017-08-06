@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
+import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -13,6 +16,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -29,7 +33,6 @@ import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_10_R1;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_11_R1;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_12_R1;
 import mkremins.fanciful.FancyMessage;
-import net.md_5.bungee.api.ChatColor;
 
 public class CaulCrafting extends JavaPlugin implements Listener {
 	
@@ -42,13 +45,18 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	//Languages availables list 
 	HashMap<String, String> languagesAvailable = new HashMap<String,String>();
 	
-	@SuppressWarnings({ "unused" })
+	@Override
 	public void onEnable(){
+		ConfigurationSerialization.registerClass(CraftArray.class);
 		Bukkit.getPluginManager().registerEvents(this, this);
 		//Setup languages
 		languagesAvailable.put("en", "English");
 		languagesAvailable.put("fr", "Français");
 		languagesAvailable.put("ru", "Русский");
+		languagesAvailable.put("nl", "Dutch");
+		languagesAvailable.put("de", "Deutsch");
+		languagesAvailable.put("ja", "日本語");
+		languagesAvailable.put("pl", "Polski");
 		//Defaults configs files (locales..)
 		configUtils.setupDefaults();
 		//Load defaults configs if empty
@@ -64,7 +72,13 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 			nmsItemsName = false;
 		}
 		//Stats (bstats) https://bstats.org/plugin/bukkit/CaulCrafting
-		MetricsLite metrics = new MetricsLite(this);
+		Metrics metrics = new Metrics(this);
+		metrics.addCustomChart(new Metrics.SimplePie("used_languages", new Callable<String>() {
+	        @Override
+	        public String call() throws Exception {
+	            return lang.getLanguage();
+	        }
+	    }));
 	} 
 	
 	Itemsname itemsname = null;
@@ -93,7 +107,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	}
 	
 	HashMap<Player,Integer> editor = new HashMap<Player,Integer>();
-	HashMap<Player,HashMap<String,ArrayList<ItemStack>>> craft = new HashMap<Player,HashMap<String,ArrayList<ItemStack>>>();
+	HashMap<Player,CraftArray> craft = new HashMap<Player,CraftArray>();
 	
 	@SuppressWarnings({ "deprecation" })
 	@Override
@@ -111,6 +125,65 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 							player.sendMessage("§d§l➤ " + lang.getTranslation("welcome_lets_start_something"));
 							new FancyMessage(" §e•§2§l " + lang.getTranslation("welcome_create_craft")).tooltip("§b" + lang.getTranslation("general_click_here")).command("/caulcrafting create").send(player);
 							new FancyMessage(" §e•§2 " + lang.getTranslation("welcome_main_command")).tooltip("§b" + lang.getTranslation("general_click_here")).command("/caulcrafting").send(player);
+						}
+					}
+					return false;
+				}else if(args[0].equalsIgnoreCase("setdropchance")) {
+					if(args.length == 3 && editor.containsKey(sender)) {
+						if(Integer.valueOf(args[1]) != null) {
+							int itemnb = Integer.valueOf(args[1]);
+							CraftArray editcraft = craft.get(sender);
+							if(editcraft.getResultItems().get(itemnb) != null) {
+								if(Double.valueOf(args[2]) != null) {
+									double prob = Double.valueOf(args[2]);
+									editcraft.addResultItem(craft.get(sender).getResultItems().get(itemnb),prob);
+									craftFormat.getCraftRecap(editcraft, "§e" + lang.getTranslation("craftmaking_craft_contents")).send(sender);
+									sender.sendMessage("§7§l§m-----");
+								}
+							}
+						}
+					}
+					return false;
+				//Editor : add player cmd
+				}else if(args[0].equalsIgnoreCase("addplayercmd") || args[0].equalsIgnoreCase("addconsolecmd")) {
+					if(editor.containsKey(sender)) {
+						String mode = (args[0].equalsIgnoreCase("addplayercmd") ? "plcmd" : "opcmd");
+						//Getting cmd by args
+						String cmdsen = "";
+						for(String arg : args) {
+							cmdsen += arg + " ";
+						}
+						cmdsen = cmdsen.replace(args[0] + " ", "");
+						if(!craft.get(sender).getCmds().contains("opcmd" + cmdsen) && !craft.get(sender).getCmds().contains("plcmd" + cmdsen)) {
+							//Adding command
+							sender.sendMessage("§7" + lang.getTranslation("craftmaking_cmd_added") + "§a " + cmdsen);
+							craft.get(sender).addCmd(mode + cmdsen);
+							//Delete option
+							new FancyMessage("§3" + lang.getTranslation("craftmaking_craft_options") + " ").then("[" + lang.getTranslation("craftmaking_cmd_delete") + "]")
+							.color(ChatColor.RED).tooltip("§b" + lang.getTranslation("general_click_here")).suggest("/ccc " + (mode == "plcmd" ? "delplayercmd" : "delconsolecmd") + " " + cmdsen).send(sender);
+							//Craft recap
+							craftFormat.getCraftRecap(craft.get(sender), "§e" + lang.getTranslation("craftmaking_craft_contents")).send(sender);
+							sender.sendMessage("§7§l§m-----");
+						}
+					}
+					return false;
+				//Editor : delete player cmd
+				}else if(args[0].equalsIgnoreCase("delplayercmd") || args[0].equalsIgnoreCase("delconsolecmd")) {
+					if(editor.containsKey(sender)) {
+						String mode = (args[0].equalsIgnoreCase("delplayercmd") ? "plcmd" : "opcmd");
+						//Getting cmd by args
+						String cmdsen = "";
+						for(String arg : args) {
+							cmdsen += arg + " ";
+						}
+						cmdsen = cmdsen.replace(args[0] + " ", "");
+						if(craft.get(sender).getCmds().contains(mode + cmdsen)) {
+							//Removing command
+							sender.sendMessage("§7" + lang.getTranslation("craftmaking_cmd_deleted") + "§c§m " + cmdsen);
+							craft.get(sender).removeCmd(mode + cmdsen);
+							//Craft recap
+							craftFormat.getCraftRecap(craft.get(sender), "§e" + lang.getTranslation("craftmaking_craft_contents")).send(sender);
+							sender.sendMessage("§7§l§m-----");
 						}
 					}
 					return false;
@@ -151,7 +224,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 								if(args.length > 1){
 									if(args.length == 3){
 										if(!editor.containsKey(player)){
-											HashMap<String,ArrayList<ItemStack>> craftcmd = new HashMap<String,ArrayList<ItemStack>>();
+											CraftArray craftcmd = new CraftArray();
 											//On converti en ItemStack
 											boolean error = false;
 											for(int i = 1; i <= 2; i++){
@@ -206,17 +279,9 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 														}
 														if(itms != null){
 															if(i == 1){
-																ArrayList<ItemStack> ccraft = new ArrayList<ItemStack>();
-																if(craftcmd.containsKey("craft"))
-																	ccraft = craftcmd.get("craft");
-																ccraft.add(itms);
-																craftcmd.put("craft", ccraft);
+																craftcmd.addCraftItem(itms);
 															} else if(i == 2){
-																ArrayList<ItemStack> ccraft = new ArrayList<ItemStack>();
-																if(craftcmd.containsKey("result"))
-																	ccraft = craftcmd.get("result");
-																ccraft.add(itms);
-																craftcmd.put("result", ccraft);
+																craftcmd.addResultItem(itms);
 															}
 														} else {
 															error = true;
@@ -228,7 +293,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 											if(!craftcmd.isEmpty()){
 												if(error == false){
 													player.sendMessage("§d§l➤ " + lang.getTranslation("craftmaking_thats_right"));
-													player.sendMessage("§b" + lang.getTranslation("craftmaking_craft_typed") + "§r " + craftFormat.getCraftRecap(craftcmd));
+													craftFormat.getCraftRecap(craftcmd, "§b" + lang.getTranslation("craftmaking_craft_typed")).send(player);
 													player.sendMessage("§e" + lang.getTranslation("craftmaking_craft_confirm_cmd"));
 													editor.put(player, 3);
 													craft.put(player, craftcmd);
@@ -248,10 +313,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 									if(!editor.containsKey(player)){
 										//Listes éditeur
 										editor.put(player, 1);
-										HashMap<String,ArrayList<ItemStack>> init = new HashMap<String,ArrayList<ItemStack>>();
-										init.put("craft", new ArrayList<ItemStack>());
-										init.put("result", new ArrayList<ItemStack>());
-										craft.put(player, init);
+										craft.put(player, new CraftArray());
 										//Explications
 										player.sendMessage("§d§l➤ " + lang.getTranslation("craftmaking_step_1"));
 										player.sendMessage("§e" + lang.getTranslation("craftmaking_step_1_explain"));
@@ -287,14 +349,14 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 								int mincraft = 10*page;
 								int maxcraft = mincraft + 10;
 								//On récup les crafts
-								ArrayList<HashMap<String,ArrayList<ItemStack>>> craftlist = craftStorage.getCrafts();
+								ArrayList<CraftArray> craftlist = craftStorage.getCrafts();
 								//On affiche la liste
 								int count = 0;
 								if(craftlist.size()-1 >= mincraft){
 									player.sendMessage("§d§l§m-----§b(" + lang.getTranslation("craftlist_page_nb").replace("%number%", "" + page) + ")");
-									for(HashMap<String,ArrayList<ItemStack>> crafts : craftlist){
+									for(CraftArray crafts : craftlist){
 										if(count >= mincraft && count <= maxcraft){
-											player.sendMessage("§6§l" + count + ".§r " + craftFormat.getCraftRecap(crafts));
+											craftFormat.getCraftRecap(crafts, "§6§l" + count + ".").send(player);
 										}
 										count++;
 									}
@@ -327,11 +389,11 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 								}
 								if(nb != -1){
 									//Getting all crafts
-									ArrayList<HashMap<String,ArrayList<ItemStack>>> craftlist = craftStorage.getCrafts();
+									ArrayList<CraftArray> craftlist = craftStorage.getCrafts();
 									//If craft number is lower than the higher craft number
 									if(craftlist.size()-1 >= nb){
-										HashMap<String, ArrayList<ItemStack>> specraft = craftlist.get(nb);
-										player.sendMessage("§7" + lang.getTranslation("craftremove_removed") + " §c§m" + ChatColor.stripColor(craftFormat.getCraftRecap(specraft)));
+										CraftArray specraft = craftlist.get(nb);
+										craftFormat.getCraftRecap(specraft, "§7" + lang.getTranslation("craftremove_removed")).send(player);
 										//Removing
 										craftStorage.removeCraft(nb);
 										//Reload config ;)
@@ -374,81 +436,108 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		//S'il est dans l'éditeur
 		if(editor.containsKey(player)){
 			e.setCancelled(true);
-			if(editor.get(player) < 3){
+			int editorstep = editor.get(player);
+			if(editorstep < 3){
+				//Getting craft
+				CraftArray globalcraft = craft.get(player);
+				//Setting mode
 				String mode = "craft";
-				if(editor.get(player) == 2)
+				if(editorstep == 2)
 					mode = "result";
 				//quitter
 				if(msg.equalsIgnoreCase("exit")){
 					editor.remove(player);
 					player.sendMessage("§c" + lang.getTranslation("craftmaking_editor_left"));
 				}
+				//Adding command
+				else if(msg.startsWith("cmd ")) {
+					if(mode == "result") {
+						String cmd = msg.replace("cmd ", "");
+						if(!cmd.startsWith("/"))
+							cmd = "/" + cmd;
+						new FancyMessage("§e" + lang.getTranslation("craftmaking_cmd_whosend") + " ").then("[" + lang.getTranslation("craftmaking_cmd_console") + "]")
+						.color(ChatColor.GOLD).tooltip("§b" + lang.getTranslation("general_click_here")).command("/ccc addconsolecmd " + cmd).then(" ")
+						.then("[" + lang.getTranslation("craftmaking_cmd_player") + "]")
+						.color(ChatColor.GOLD).tooltip("§b" + lang.getTranslation("general_click_here")).command("/ccc addplayercmd " + cmd).send(player);
+						player.sendMessage("§7§l§m-----");
+					}
+				}
 				//ajouter un craft
 				else if(msg.equalsIgnoreCase("add")){
 					ItemStack item = player.getInventory().getItemInMainHand();
 					if(item != null){
-						player.sendMessage("§7§l§m-----");
 						//Affichage du nom
 						String name = craftFormat.getName(item);
 						player.sendMessage("§7" + lang.getTranslation("craftmaking_item_added") + "§a " + name);
 						//Ajout définitif
-						ArrayList<ItemStack> globalcraft = craft.get(player).get(mode);
-						globalcraft.add(item);
-						HashMap<String,ArrayList<ItemStack>> totalcraft = craft.get(player);
-						totalcraft.put(mode, globalcraft);
-						craft.put(player, totalcraft);
+						int nb = -1;
+						if(mode == "craft") {
+							globalcraft.addCraftItem(item);
+							craft.put(player, globalcraft);
+						} else {
+							globalcraft.addResultItem(item);
+							craft.put(player, globalcraft);
+							nb = globalcraft.getResultItems().indexOf(item);
+						}
 						//Recap
-						String recap = craftFormat.getCraftRecap(totalcraft);
-						player.sendMessage("§e" + lang.getTranslation("craftmaking_craft_contents") + "§r " + recap);
+						craftFormat.getCraftRecap(globalcraft, "§e" + lang.getTranslation("craftmaking_craft_contents")).send(player);
+						//Add probability
+						if(nb > -1) {
+							new FancyMessage("§3" + lang.getTranslation("craftmaking_craft_options") + " ").then("[" + lang.getTranslation("craftmaking_craft_options_dropchance") + "]")
+							.color(ChatColor.GOLD).tooltip("§b" + lang.getTranslation("general_click_here")).suggest("/ccc setdropchance " + nb + " <0.01-100>").send(player);
+						}
 						//Rappel commandes
 						player.sendMessage("§7§l§m-----");
 					}
 				}
 				//supprimer le dernier
 				else if(msg.equalsIgnoreCase("removelast")){
-					ArrayList<ItemStack> globalcraft = craft.get(player).get(mode);
 					if(globalcraft != null){
-						ItemStack deleted = globalcraft.get(globalcraft.size()-1);
-						//Supression du dernier item ajouté
-						globalcraft.remove(globalcraft.size()-1);
-						HashMap<String,ArrayList<ItemStack>> totalcraft = craft.get(player);
-						totalcraft.put(mode, globalcraft);
-						craft.put(player, totalcraft);
-						player.sendMessage("§7§l§m-----");
+						ItemStack torem = null;
+						if(mode == "craft") {
+							//Getting last item added
+							torem = globalcraft.getCraft().get(globalcraft.getCraft().size()-1);
+							//Removing item
+							globalcraft.removeCraftItem(torem);
+							craft.put(player, globalcraft);
+						} else {
+							//Getting last item added
+							torem = globalcraft.getResultItems().get(globalcraft.getResultItems().size()-1);
+							//Removing item
+							globalcraft.removeResultItem(torem);
+							craft.put(player, globalcraft);
+						}
+						//Messages
 						//Affichage du nom
-						String name = craftFormat.getName(deleted);
+						String name = craftFormat.getName(torem);
 						player.sendMessage("§7" + lang.getTranslation("craftmaking_item_removed") + " §c§m" + name);
 						//Recap
-						String recap = craftFormat.getCraftRecap(totalcraft);
-						player.sendMessage("§e" + lang.getTranslation("craftmaking_craft_contents") + "§r " + recap);
+						craftFormat.getCraftRecap(globalcraft, "§e" + lang.getTranslation("craftmaking_craft_contents")).send(player);
 						//Rappel commandes
 						player.sendMessage("§7§l§m-----");
 					}
 				}
 				//passer à l'étape suivante
 				else if(msg.equalsIgnoreCase("next")){
-					Integer phase = editor.get(player);
-					if(phase == 1){ //Passage à l'éditeur de résultat
-						ArrayList<ItemStack> globalcraft = craft.get(player).get("craft");
-						if(!globalcraft.isEmpty()){
+					if(mode == "craft"){ //Passage à l'éditeur de résultat
+						if(!globalcraft.getCraft().isEmpty()){
 							player.sendMessage("§d§l➤ " + lang.getTranslation("craftmaking_step_2"));
 							player.sendMessage("§e" + lang.getTranslation("craftmaking_step_2_explain"));
 							player.sendMessage("§f§l§m-----");
+							player.sendMessage("§b" + lang.getTranslation("craftmaking_editor_cmd_cmd"));
 							player.sendMessage("§7" + lang.getTranslation("craftmaking_editor_cmd_exit"));
 							player.sendMessage("§7" + lang.getTranslation("craftmaking_editor_cmd_removelast"));
 							player.sendMessage("§e" + lang.getTranslation("craftmaking_editor_cmd_next"));
 							player.sendMessage("§d§l§m-----");
-							player.sendMessage("§a" + lang.getTranslation("craftmaking_craft_contents") + "§r " + craftFormat.getCraftRecap(craft.get(player)));
 							editor.put(player, 2);
 						} else {
 							player.sendMessage("§c" + lang.getTranslation("craftmaking_step_1_add_items"));
 						}
-					} else if(phase == 2){ //Enregistrement
-						ArrayList<ItemStack> globalcraft = craft.get(player).get("craft");
-						if(!globalcraft.isEmpty()){
+					} else if(mode == "result"){ //Enregistrement
+						if(!globalcraft.getResult().isEmpty() || !globalcraft.getCmds().isEmpty()){
 							player.sendMessage("§a§l➤ " + lang.getTranslation("craftmaking_step_final"));
-							player.sendMessage("§e" + lang.getTranslation("craftmaking_craft_created") + "§r " + craftFormat.getCraftRecap(craft.get(player)));
-							craftStorage.addCraft(craft.get(player));
+							craftFormat.getCraftRecap(globalcraft, "§e" + lang.getTranslation("craftmaking_craft_created")).send(player);
+							craftStorage.addCraft(globalcraft);
 							craft.remove(player);
 							editor.remove(player);
 							reloadConfig();
@@ -459,17 +548,19 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 				} else {
 					player.sendMessage("§7§l§m-----");
 					player.sendMessage("§b" + lang.getTranslation("craftmaking_editor_cmd_add"));
+					if(mode == "result")
+						player.sendMessage("§b" + lang.getTranslation("craftmaking_editor_cmd_cmd"));
 					player.sendMessage("§7" + lang.getTranslation("craftmaking_editor_cmd_exit"));
 					player.sendMessage("§7" + lang.getTranslation("craftmaking_editor_cmd_removelast"));
 					player.sendMessage("§e" + lang.getTranslation("craftmaking_editor_cmd_next"));
 					player.sendMessage("§7§l§m-----");
 				}
 			} else {
-				if(editor.get(player) == 3){
+				if(editorstep == 3){
 					//Craft entré via commande, demande de confirmation
 					if(msg.equalsIgnoreCase("yes")){
 						player.sendMessage("§a§l➤ " + lang.getTranslation("craftmaking_step_final"));
-						player.sendMessage("§e" + lang.getTranslation("craftmaking_craft_created") + "§r " + craftFormat.getCraftRecap(craft.get(player)));
+						craftFormat.getCraftRecap(craft.get(player), "§e" + lang.getTranslation("craftmaking_craft_created")).send(player);
 						craftStorage.addCraft(craft.get(player));
 						craft.remove(player);
 						editor.remove(player);
@@ -488,6 +579,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	ArrayList<Player> craftProc = new ArrayList<Player>();
 	HashMap<Player,Location> caulLoc = new HashMap<Player,Location>();
 	HashMap<Player,ArrayList<ItemStack>> inCaulFin = new HashMap<Player,ArrayList<ItemStack>>();
+	Random random = new Random();
 	
 	public static Entity[]  getNearbyEntities(Location l, int radius){
 	      int chunkRadius = radius < 16 ? 1 : (radius - (radius % 16))/16;
@@ -510,27 +602,40 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		//EDITOR BY DROPPING
 		if(editor.containsKey(player)){
 			e.setCancelled(true);
-			if(editor.get(player) < 3){
+			int editorstep = editor.get(player);
+			if(editorstep < 3){
 				String mode = "craft";
-				if(editor.get(player) == 2)
+				if(editorstep == 2)
 					mode = "result";
 				if(item != null){
-					player.sendMessage("§7§l§m-----");
+					//Amount
+					ItemStack finalitem = item.getItemStack().clone();
+					ItemStack itemhand = new ItemStack(player.getInventory().getItemInMainHand());
+					itemhand.setAmount(1);
+					if(itemhand.isSimilar(item.getItemStack()))
+						finalitem.setAmount(player.getInventory().getItemInMainHand().getAmount()+1);
 					//Affichage du nom
-					String name = craftFormat.getName(item.getItemStack());
+					String name = craftFormat.getName(finalitem);
 					player.sendMessage("§7" + lang.getTranslation("craftmaking_item_added") + "§a " + name);
 					//Ajout définitif
-					ArrayList<ItemStack> globalcraft = craft.get(player).get(mode);
-					globalcraft.add(item.getItemStack());
-					HashMap<String,ArrayList<ItemStack>> totalcraft = craft.get(player);
-					totalcraft.put(mode, globalcraft);
-					craft.put(player, totalcraft);
+					CraftArray globalcraft = craft.get(player);
+					int nb = -1;
+					if(mode == "craft") {
+						globalcraft.addCraftItem(finalitem);
+					} else {
+						globalcraft.addResultItem(finalitem);
+						nb = globalcraft.getResultItems().indexOf(finalitem);
+					}
+					craft.put(player, globalcraft);
 					//Recap
-					String recap = craftFormat.getCraftRecap(totalcraft);
-					player.sendMessage("§e" + lang.getTranslation("craftmaking_craft_contents") + "§r " + recap);
+					craftFormat.getCraftRecap(globalcraft, "§e" + lang.getTranslation("craftmaking_craft_contents")).send(player);
+					//Add probability
+					if(nb > -1) {
+						new FancyMessage("§3" + lang.getTranslation("craftmaking_craft_options") + " ").then("[" + lang.getTranslation("craftmaking_craft_options_dropchance") + "]")
+						.color(ChatColor.GOLD).tooltip("§b" + lang.getTranslation("general_click_here")).suggest("/ccc setdropchance " + nb + " <0.01-100>").send(player);
+					}
 					//Rappel commandes
 					player.sendMessage("§7§l§m-----");
-					e.setCancelled(true);
 					return;
 				}
 				
@@ -591,18 +696,18 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 					//On éxécute le craft
 					sendDebug(player,"STEP2 c/c - cauldron content ok (" + count + " items)");
 					//On récup tous les crafts
-					ArrayList<HashMap<String,ArrayList<ItemStack>>> allcrafts = craftStorage.getCrafts();
+					ArrayList<CraftArray> allcrafts = craftStorage.getCrafts();
 					//Un par un on voit s'ils correspondent
-					HashMap<String,ArrayList<ItemStack>> actualcraft = new HashMap<String,ArrayList<ItemStack>>();
+					CraftArray actualcraft = new CraftArray();
 					boolean stop = false;
 					sendDebug(player,"STEP3 a/a - checking the craft");
-					for(HashMap<String,ArrayList<ItemStack>> ecraft : allcrafts){
+					for(CraftArray ecraft : allcrafts){
 						if(stop == false){
-							ArrayList<ItemStack> need = ecraft.get("craft");
+							ArrayList<ItemStack> need = ecraft.getCraft();
 							ArrayList<ItemStack> droped = inCaulFin.get(player);
 							actualcraft = ecraft;
 							//S'ils sont similaires on arrête la boucle
-							if(droped.containsAll(need)){
+							if(!droped.isEmpty() && droped.containsAll(need)){
 								stop = true;
 								sendDebug(player,"STEP4a a/d - craft detected : " + ecraft.toString());
 							}
@@ -617,15 +722,37 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 						for(Entity ent : getNearbyEntities(cauldronlocation,1)){
 							if(ent instanceof Item){
 								Item itm = (Item)ent;
-								if(actualcraft.get("craft").contains(itm.getItemStack())){
+								if(actualcraft.getCraft().contains(itm.getItemStack())){
 									ent.remove();
 								}
 							}
 						}
 						sendDebug(player,"STEP4a c/d - sending rewards");
-						//Craft reward
-						for(ItemStack itemresult : actualcraft.get("result"))
-							cauldronlocation.getWorld().dropItemNaturally(cauldronlocation.clone().add(0, 1, 0), itemresult);
+						//reward items
+						HashMap<ItemStack, Integer> craftrewards = actualcraft.getResult();
+						for(ItemStack itemresult : craftrewards.keySet()) {
+							int itemrd = craftrewards.get(itemresult);
+							if(itemrd < 1000) {
+								//drop chance
+								int rd = random.nextInt(1001); //0-1000
+								if(rd <= itemrd)
+									cauldronlocation.getWorld().dropItemNaturally(cauldronlocation.clone().add(0, 1, 0), itemresult);
+							} else {
+								cauldronlocation.getWorld().dropItemNaturally(cauldronlocation.clone().add(0, 1, 0), itemresult);
+							}
+						}
+						//reward commands
+						for(String cmd : actualcraft.getCmds()) {
+							//by player
+							if(cmd.startsWith("plcmd")) {
+								cmd = cmd.replace("plcmd/", "");
+								player.performCommand(cmd);
+							} else if(cmd.startsWith("opcmd")) {
+								cmd = cmd.replace("opcmd/", "");
+								getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd.replaceAll("<player>", player.getName()));
+							}
+							
+						}
 						//Particles
 						sendDebug(player,"STEP4a d/d - sending particles");
 						cauldronlocation.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, cauldronlocation, 40);

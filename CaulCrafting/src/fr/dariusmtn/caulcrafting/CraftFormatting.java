@@ -3,8 +3,12 @@ package fr.dariusmtn.caulcrafting;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.bukkit.ChatColor;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+
+import mkremins.fanciful.FancyMessage;
+
 
 public class CraftFormatting implements Listener {
     
@@ -13,33 +17,57 @@ public class CraftFormatting implements Listener {
           this.plugin = instance; 
     }
     
-    public String getCraftRecap(HashMap<String,ArrayList<ItemStack>> globalcraft){
-		ArrayList<ItemStack> need = globalcraft.get("craft");
-		ArrayList<ItemStack> result = globalcraft.get("result");
-		String name = "";
+    public FancyMessage getCraftRecap(CraftArray globalcraft, String headtext){
+		ArrayList<ItemStack> need = globalcraft.getCraft();
+		HashMap<ItemStack,Integer> result = globalcraft.getResult();
+		ArrayList<String> cmds = globalcraft.getCmds();
 		//Elements requis
-		String reNeed = "";
+		FancyMessage formcraft = new FancyMessage(headtext + "§r" + (headtext == "" ? "" : " "));
+		boolean first = true;
 		if(!need.isEmpty()){
 			for(ItemStack item : need){
-				name = getName(item);
-				reNeed += (reNeed == "" ? "" : ", ") + name + "§r";
+				String name = getName(item);
+				formcraft.then((first ? "" : ", ") + name);
+				if(item.hasItemMeta() && item.getItemMeta().hasEnchants()) {
+					formcraft.then(" ").then("ℇ").color(ChatColor.LIGHT_PURPLE).style(ChatColor.BOLD).tooltip("§b" + plugin.lang.getTranslation("general_enchanted"));
+				}
+				formcraft.then("§r");
+				first = false;
 			}
 		} else {
-			reNeed = "§7§o" + plugin.lang.getTranslation("general_undefined");
+			formcraft.then(plugin.lang.getTranslation("general_undefined")).color(ChatColor.GRAY).style(ChatColor.ITALIC);
 		}
+		first = true;
+		formcraft.then(" ").then("--").color(ChatColor.YELLOW).style(ChatColor.BOLD).style(ChatColor.STRIKETHROUGH).then(">").color(ChatColor.YELLOW).style(ChatColor.BOLD).then(" §r");
 		//Elements donnés 
-		String reResult = "";
 		if(!result.isEmpty()){
-			for(ItemStack item : result){
-				name = getName(item);
-				reResult += (reResult == "" ? "" : ", ") + name + "§r";
+			for(ItemStack item : result.keySet()){
+				String name = getName(item);
+				formcraft.then((first ? "" : ", ") + name);
+				if(item.hasItemMeta() && item.getItemMeta().hasEnchants()) {
+					formcraft.then(" ").then("ℇ").color(ChatColor.LIGHT_PURPLE).style(ChatColor.BOLD).tooltip("§b" + plugin.lang.getTranslation("general_enchanted"));
+				}
+				double luck = result.get(item)/10;
+				if(luck < 100) {
+					String luckStr = (String.valueOf(luck) + " ").replace(".0 ", "").replace(" ", "");
+					formcraft.then(" ").then("☘").color(ChatColor.YELLOW).tooltip("§e" + plugin.lang.getTranslation("general_drop_chance").replace("%chance%", "§6§l" + luckStr));
+				}
+				formcraft.then("§r");
+				first = false;
 			}
 		} else {
-			reResult = "§7§o" + plugin.lang.getTranslation("general_undefined");
+			first = true;
+			if(cmds.isEmpty())
+				formcraft.then(plugin.lang.getTranslation("general_undefined")).color(ChatColor.GRAY).style(ChatColor.ITALIC);
+		}
+		if(!cmds.isEmpty()) {
+			for(String cmd : cmds){
+				String[] cmdsplit = cmd.split(" ");
+				formcraft.then((first ? "" : ", ") + cmdsplit[0].replace("plcmd", "").replace("opcmd", ""));
+			}
 		}
 		//Recap
-		String recap = reNeed + " §e§l§m--§e§l>§r " + reResult;
-		return recap;
+		return formcraft;
 	}
 	
 	public String getName(ItemStack stack) {

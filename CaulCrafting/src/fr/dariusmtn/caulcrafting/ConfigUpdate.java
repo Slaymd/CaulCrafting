@@ -29,7 +29,7 @@ public class ConfigUpdate implements Listener {
 				craftlist = (ArrayList<HashMap<String, ArrayList<ItemStack>>>) plugin.getConfig().get("Crafts");
 			//New file
 			try {
-				File craftfile = new File(plugin.getDataFolder() + "/crafts.yml");
+				File craftfile = new File(plugin.getDataFolder(), "crafts.yml");
 				craftfile.createNewFile();
 				FileConfiguration craftconfig = YamlConfiguration.loadConfiguration(craftfile);
 				craftconfig.set("Crafts", craftlist);
@@ -45,6 +45,39 @@ public class ConfigUpdate implements Listener {
 			plugin.saveDefaultConfig();
 			plugin.reloadConfig();
 		}
+		//Màj config V2 : craft storage
+		if(plugin.getConfig().getInt("config_version") == 2) {
+			plugin.getLogger().info("CaulCrafting config has changed : trying to convert...");
+			try {
+				//Getting craft.yml file
+				File craftfile = new File(plugin.getDataFolder(), "crafts.yml");
+				craftfile.createNewFile();
+				FileConfiguration craftconfig = YamlConfiguration.loadConfiguration(craftfile);
+				//Getting whole crafts 
+				ArrayList<HashMap<String,ArrayList<ItemStack>>> craftlist = new ArrayList<HashMap<String,ArrayList<ItemStack>>>();
+				if(craftconfig.isSet("Crafts"))
+					craftlist = (ArrayList<HashMap<String, ArrayList<ItemStack>>>) craftconfig.get("Crafts");
+				//remove old crafts
+				craftfile.delete();
+				//converting all craft
+				for(HashMap<String, ArrayList<ItemStack>> craft : craftlist) {
+					//Getting main array
+					ArrayList<ItemStack> recipe = craft.get("craft");
+					ArrayList<ItemStack> reward = craft.get("result");
+					//Creating new Craft Object
+					CraftArray convertedcraft = new CraftArray(recipe,reward);
+					//saving the converted craft
+					plugin.craftStorage.addCraft(convertedcraft);
+				}
+				plugin.getLogger().info("CaulCrafting : Conversion succeed");
+				plugin.saveResource("config.yml", true);
+			} catch (IOException e) {
+				plugin.getLogger().warning("CaulCrafting : Conversion failed");
+				Bukkit.getPluginManager().disablePlugin(plugin);
+			}
+			
+		}
+		
 		
 	}
 
