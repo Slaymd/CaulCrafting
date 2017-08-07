@@ -2,7 +2,8 @@ package fr.dariusmtn.caulcrafting;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Properties;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -55,18 +56,18 @@ public class Language implements Listener {
 		String transl = code;
 		try {
 			File locfile = new File(plugin.getDataFolder() + "/lang/" + locale + ".properties");
-			InputStream locStream = new FileInputStream(locfile);
+			FileInputStream locStream = new FileInputStream(locfile);
 			Properties locprop = new Properties();
-			locprop.load(locStream);
+			locprop.load(new InputStreamReader(locStream, Charset.forName("UTF-8")));
 			transl = locprop.getProperty(code.toLowerCase());
 			locStream.close();
 			return transl.replaceAll("&", "§");
 		} catch (Exception e) {
 			try {
 				File locfile = new File(plugin.getDataFolder() + "/lang/en.properties");
-				InputStream locStream = new FileInputStream(locfile);
+				FileInputStream locStream = new FileInputStream(locfile);
 				Properties locprop = new Properties();
-				locprop.load(locStream);
+				locprop.load(new InputStreamReader(locStream, Charset.forName("UTF-8")));
 				transl = locprop.getProperty(code.toLowerCase());
 				locStream.close();
 				return transl.replaceAll("&", "§");
