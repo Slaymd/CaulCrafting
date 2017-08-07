@@ -32,6 +32,8 @@ import fr.dariusmtn.caulcrafting.itemsname.Itemsname;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_10_R1;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_11_R1;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_12_R1;
+import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_9_R1;
+import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_9_R2;
 import mkremins.fanciful.FancyMessage;
 
 public class CaulCrafting extends JavaPlugin implements Listener {
@@ -103,6 +105,10 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 			itemsname = new Itemsname_1_11_R1();
 		} else if(version.equalsIgnoreCase("v1_10_R1")){
 			itemsname = new Itemsname_1_10_R1();
+		} else if(version.equalsIgnoreCase("v1_9_R2")){
+			itemsname = new Itemsname_1_9_R2();
+		} else if(version.equalsIgnoreCase("v1_9_R1")){
+			itemsname = new Itemsname_1_9_R1();
 		}
 		return itemsname != null;
 	}
