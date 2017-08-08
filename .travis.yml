@@ -3,15 +3,10 @@ sudo: false
 before_script: cd CaulCrafting
 before_install:
   - wget http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.12.jar
-  - mvn validate
-  - wget -P jars/ http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.11.jar
-  - mvn validate
-  - wget -P jars/ http://dariusmtn.fr/caulcrafting/Spigot-1.10.jar
-  - mvn validate
-  - wget -P jars/ http://dariusmtn.fr/caulcrafting/Spigot-1.9_R1.jar
-  - mvn validate
-  - wget -P jars/ http://dariusmtn.fr/caulcrafting/Spigot-1.9_R2.jar
-  - mvn validate
+  - wget http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.11.jar
+  - wget http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.10.jar
+  - wget http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.9_R1.jar
+  - wget http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.9_R2.jar
 notifications:
   email: false
 deploy:
