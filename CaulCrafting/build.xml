@@ -10,11 +10,11 @@
     <property name="source" value="1.8"/>
     <path id="CaulCrafting.classpath">
         <pathelement location="bin"/>
-        <pathelement location="../../../../OneDrive/Code/Java/_API/_Spigot/spigot-1.9-R0.1-SNAPSHOT-latest.jar"/>
-        <pathelement location="../../../../OneDrive/Code/Java/_API/_Spigot/Spigot 1.10.jar"/>
-        <pathelement location="../../../../OneDrive/Code/Java/_API/_Spigot/spigot-1.9.4-R0.1-SNAPSHOT-latest.jar"/>
-        <pathelement location="../../../../OneDrive/Code/Java/_API/_Spigot/Spigot-1.11.2.jar"/>
-        <pathelement location="../../../../OneDrive/Code/Java/_API/_Spigot/spigot-1.12.jar"/>
+        <pathelement location="Spigot-1.10.jar"/>
+        <pathelement location="Spigot-1.9_R2.jar"/>
+        <pathelement location="Spigot-1.9_R1.jar"/>
+        <pathelement location="Spigot-1.11.2.jar"/>
+        <pathelement location="Spigot-1.12.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
