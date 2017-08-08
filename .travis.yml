@@ -2,7 +2,7 @@ language: java
 sudo: false
 before_script: cd CaulCrafting
 before_install:
-  - wget -P jars/ http://dariusmtn.fr/caulcrafting/Spigot-1.12.jar
+  - git clone -P jars/ http://dariusmtn.fr/caulcrafting/Spigot-1.12.jar
   - mvn validate
   - wget -P jars/ http://dariusmtn.fr/caulcrafting/Spigot-1.11.jar
   - mvn validate
