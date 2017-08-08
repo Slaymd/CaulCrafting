@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- WARNING: Eclipse auto-generated file. 
-              Any modifications will be overwritten. 
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
               To include a user specific buildfile here, simply create one in the same
               directory with the processing instruction <?eclipse.ant.import?>
               as the first entry and export the buildfile again. --><project basedir="." default="build" name="CaulCrafting">
@@ -9,11 +9,11 @@
     <property name="target" value="1.8"/>
     <property name="source" value="1.8"/>
     <path id="CaulCrafting.classpath">
-    	<pathelement location="Spigot-1.12.jar"/>
-        <pathelement location="Spigot-1.10.jar"/>
-        <pathelement location="Spigot-1.9_R2.jar"/>
-        <pathelement location="Spigot-1.9_R1.jar"/>
-        <pathelement location="Spigot-1.11.2.jar"/>
+        <pathelement location="bin/Spigot-1.10.jar"/>
+        <pathelement location="bin/Spigot-1.9_R2.jar"/>
+        <pathelement location="bin/Spigot-1.9_R1.jar"/>
+        <pathelement location="bin/Spigot-1.11.2.jar"/>
+        <pathelement location="bin/Spigot-1.12.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
