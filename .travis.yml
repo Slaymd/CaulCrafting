@@ -1,6 +1,6 @@
 language: java
 sudo: false
-script: ant main
+script: ant build
 before_script: cd CaulCrafting
 before_install:
   - wget http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.12.jar
