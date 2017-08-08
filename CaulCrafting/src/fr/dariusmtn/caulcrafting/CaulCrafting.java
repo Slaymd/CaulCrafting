@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
@@ -583,9 +584,9 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		
 	}
 	
-	ArrayList<Player> craftProc = new ArrayList<Player>();
-	HashMap<Player,Location> caulLoc = new HashMap<Player,Location>();
-	HashMap<Player,ArrayList<ItemStack>> inCaulFin = new HashMap<Player,ArrayList<ItemStack>>();
+	ArrayList<UUID> craftProc = new ArrayList<UUID>();
+	HashMap<UUID,Location> caulLoc = new HashMap<UUID,Location>();
+	HashMap<UUID,ArrayList<ItemStack>> inCaulFin = new HashMap<UUID,ArrayList<ItemStack>>();
 	Random random = new Random();
 	
 	public static Entity[]  getNearbyEntities(Location l, int radius){
@@ -658,8 +659,8 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 					if(itemLoc.getBlock().getType() == Material.CAULDRON){
 						if(player.hasPermission("caulcrafting.use")) {
 							Block caul = itemLoc.getBlock();
-							if(!caulLoc.containsKey(player))
-								caulLoc.put(player, caul.getLocation());
+							if(!caulLoc.containsKey(player.getUniqueId()))
+								caulLoc.put(player.getUniqueId(), caul.getLocation());
 							//Si le chaudron contient de l'eau
 							if(caul.getData() > 0){
 								sendDebug(player,"STEP1 a/b - detecting dropping into cauldron " + item.getItemStack().getType());
@@ -674,28 +675,30 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 				}
 			}
 		},20);
-		if(!craftProc.contains(player)){
-			craftProc.add(player);
+		if(!craftProc.contains(player.getUniqueId())){
+			craftProc.add(player.getUniqueId());
+			sendDebug(player,"STEP1* a/b - starting scheduler...");
 			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable(){
 				@SuppressWarnings({ "deprecation" })
 				public void run(){
-					if(!caulLoc.containsKey(player))
-						return;
 					//Suppression des valeurs.
 					clearVar(player);
+					if(!caulLoc.containsKey(player.getUniqueId()))
+						return;
+					sendDebug(player,"STEP1* b/b - scheduler launched!");
 					int count = 0;
 					sendDebug(player,"STEP2 a/c - verifying cauldron content...");
-					for(Entity entIn : caulLoc.get(player).getChunk().getEntities()){
+					for(Entity entIn : caulLoc.get(player.getUniqueId()).getChunk().getEntities()){
 						if(entIn.getType() == EntityType.DROPPED_ITEM){
 							ItemStack itms = ((Item)entIn).getItemStack();
 							if(entIn.getLocation().getBlock().getType() == Material.CAULDRON){
 								count++;
 								//Ajout dans la liste du chaudron
 								ArrayList<ItemStack> itemToAdd = new ArrayList<ItemStack>();
-								if(inCaulFin.containsKey(player))
-									itemToAdd = inCaulFin.get(player);
+								if(inCaulFin.containsKey(player.getUniqueId()))
+									itemToAdd = inCaulFin.get(player.getUniqueId());
 								itemToAdd.add(itms);
-								inCaulFin.put(player, itemToAdd);
+								inCaulFin.put(player.getUniqueId(), itemToAdd);
 								sendDebug(player,"STEP2 b/c - items in cauldron +" + itms.getType().toString());
 							}
 						}
@@ -711,7 +714,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 					for(CraftArray ecraft : allcrafts){
 						if(stop == false){
 							ArrayList<ItemStack> need = ecraft.getCraft();
-							ArrayList<ItemStack> droped = inCaulFin.get(player);
+							ArrayList<ItemStack> droped = inCaulFin.get(player.getUniqueId());
 							actualcraft = ecraft;
 							//S'ils sont similaires on arrête la boucle
 							if(!droped.isEmpty() && droped.containsAll(need)){
@@ -721,7 +724,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 						}
 					}
 					//Centre du cauldron
-					Location cauldronlocation = caulLoc.get(player).add(0.5, 0, 0.5);
+					Location cauldronlocation = caulLoc.get(player.getUniqueId()).add(0.5, 0, 0.5);
 					if(stop == true){
 						sendDebug(player,"STEP4a b/d - removing cauldrons items (into)");
 						//Craft valide
@@ -767,7 +770,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 						//Water layer
 						if(!player.hasPermission("caulcrafting.nowaterconsume")) {
 							sendDebug(player,"STEP4a* a/a - modifying water layers");
-							Block caul = caulLoc.get(player).getBlock();
+							Block caul = caulLoc.get(player.getUniqueId()).getBlock();
 							byte caulData = caul.getData();
 							caul.setData((byte) (caulData-1));
 						}
@@ -794,9 +797,9 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		 Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable(){
 			 public void run(){
 				 sendDebug(player,"STEP5 a/b - starting removing vars");
-				 craftProc.remove(player);
-				 caulLoc.remove(player);
-				 inCaulFin.remove(player);
+				 craftProc.remove(player.getUniqueId());
+				 caulLoc.remove(player.getUniqueId());
+				 inCaulFin.remove(player.getUniqueId());
 				 sendDebug(player,"STEP5 b/b - removing vars succeed");
 			 }
 		 },4);
