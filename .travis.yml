@@ -2,11 +2,12 @@ language: java
 sudo: false
 before_script: cd CaulCrafting
 before_install:
-  - wget http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.12.jar
-  - wget http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.11.2.jar
-  - wget http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.10.jar
-  - wget http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.9_R1.jar
-  - wget http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.9_R2.jar
+  - mkdir lib/
+  - wget "lib/" http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.12.jar
+  - wget "lib/" http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.11.2.jar
+  - wget "lib/" http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.10.jar
+  - wget "lib/" http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.9_R1.jar
+  - wget "lib/" http://dariusmtn.fr/caulcrafting/spigotjar/Spigot-1.9_R2.jar
 notifications:
   email: false
 deploy:
