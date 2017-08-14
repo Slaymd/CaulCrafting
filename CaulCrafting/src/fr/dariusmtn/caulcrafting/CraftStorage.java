@@ -50,17 +50,21 @@ public class CraftStorage implements Listener {
     	}
     }
     
+    
+    
     public void removeCraft(int nb) {
-    	//List of all crafts 
-    	ArrayList<CraftArray> craftlist = getCrafts();
 		try {
-			//removing
-			craftlist.remove(nb);
 			//replacing in the file
 	    	File craftfile = new File(plugin.getDataFolder(), "crafts.yml");
 			craftfile.createNewFile();
 			FileConfiguration craftconfig = YamlConfiguration.loadConfiguration(craftfile);
-			craftconfig.set("Crafts", craftlist);
+			int count = 0;
+			for(String craftuuid : craftconfig.getConfigurationSection("Crafts").getKeys(false)) {
+				if(nb == count) {
+					craftconfig.set(craftuuid, null);
+				}
+				count++;
+			}
 			craftconfig.save(craftfile);
     	} catch (Exception e) {
     		//
