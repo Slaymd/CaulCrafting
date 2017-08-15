@@ -2,6 +2,7 @@ package fr.dariusmtn.caulcrafting.listeners;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -33,6 +34,20 @@ public class ItemDropListener implements Listener {
 	}
 	
 	Random random = new Random();
+	
+	Entity[] getNearbyEntities(Location l, int radius){
+		int chunkRadius = radius < 16 ? 1 : (radius - (radius % 16))/16;
+		HashSet<Entity> radiusEntities = new HashSet<Entity>();
+      	for (int chX = 0 -chunkRadius; chX <= chunkRadius; chX ++){
+      		for (int chZ = 0 -chunkRadius; chZ <= chunkRadius; chZ++){
+      			int x=(int) l.getX(),y=(int) l.getY(),z=(int) l.getZ();
+      			for (Entity e : new Location(l.getWorld(),x+(chX*16),y,z+(chZ*16)).getChunk().getEntities()){
+      				if (e.getLocation().distance(l) <= radius && e.getLocation().getBlock() != l.getBlock()) radiusEntities.add(e);
+      			}
+      		}
+      	}
+	     return radiusEntities.toArray(new Entity[radiusEntities.size()]);
+	}
 	
 	@EventHandler
 	public void onItemDrop(PlayerDropItemEvent e){
@@ -69,7 +84,6 @@ public class ItemDropListener implements Listener {
 					//Si l'item est dans un chadron
 					if(itemLoc.getBlock().getType() == Material.CAULDRON){
 						Block caul = itemLoc.getBlock();
-						
 						//Event: CaulCraftDroppingEvent
 						plugin.sendDebug(player,"API : CaulCraftDroppingEvent");
 						CaulCraftDroppingEvent ccEvent = new CaulCraftDroppingEvent(player, caul, Particle.SPELL_MOB, Sound.BLOCK_BREWING_STAND_BREW);
@@ -103,7 +117,7 @@ public class ItemDropListener implements Listener {
 				@SuppressWarnings({ "deprecation" })
 				public void run(){
 					//Suppression des valeurs.
-					plugin.clearVar(player);
+					clearVar(player);
 					if(!plugin.caulLoc.containsKey(player.getUniqueId()))
 						return;
 					plugin.sendDebug(player,"STEP1* b/b - scheduler launched!");
@@ -162,7 +176,7 @@ public class ItemDropListener implements Listener {
 						
 						//removing cauldron items
 						plugin.sendDebug(player,"STEP4a b/d - removing cauldrons items (into)");
-						for(Entity ent : plugin.getNearbyEntities(cauldronlocation,1)){
+						for(Entity ent : getNearbyEntities(cauldronlocation,1)){
 							if(ent instanceof Item && ccEvent.isItemDeleting()){
 								Item itm = (Item)ent;
 								if(ccEvent.getCraft().getCraft().contains(itm.getItemStack())){
@@ -232,6 +246,18 @@ public class ItemDropListener implements Listener {
 				}
 			},100);
 		}	 
+	}
+	
+	void clearVar(final Player player){
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+			public void run(){
+				plugin.sendDebug(player,"STEP5 a/b - starting removing vars");
+				plugin.craftProc.remove(player.getUniqueId());
+				plugin.caulLoc.remove(player.getUniqueId());
+				plugin.inCaulFin.remove(player.getUniqueId());
+				plugin.sendDebug(player,"STEP5 b/b - removing vars succeed");
+			}
+		},4);
 	}
 	
 
