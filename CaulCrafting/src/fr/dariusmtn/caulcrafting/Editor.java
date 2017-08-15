@@ -29,12 +29,17 @@ public class Editor implements Listener{
 		}
 		plugin.craft.put(player, globalcraft);
 		//Recap
-		plugin.craftFormat.getCraftRecap(globalcraft, "§e" + plugin.lang.getTranslation("craftmaking_craft_contents")).send(player);
-		//Add probability
+		plugin.craftFormat.getCraftRecap(globalcraft, "§e" + plugin.lang.getTranslation("craftmaking_craft_contents"), true).send(player);
+		//Options
+		FancyMessage options = new FancyMessage("§3" + plugin.lang.getTranslation("craftmaking_craft_options") + " ");
+		//Probability
 		if(nb > -1) {
-			new FancyMessage("§3" + plugin.lang.getTranslation("craftmaking_craft_options") + " ").then("[" + plugin.lang.getTranslation("craftmaking_craft_options_dropchance") + "]")
-			.color(ChatColor.GOLD).tooltip("§b" + plugin.lang.getTranslation("general_click_here")).suggest("/ccc setdropchance " + nb + " <0.01-100>").send(player);
+			options.then("[" + plugin.lang.getTranslation("craftmaking_craft_options_dropchance") + "]")
+			.color(ChatColor.GOLD).tooltip("§b" + plugin.lang.getTranslation("general_click_here")).suggest("/ccc setdropchance " + nb + " <0.01-100>").then(" ");
 		}
+		//Next Step
+		options.then("[" + plugin.lang.getTranslation("craftmaking_next_step") + "]").color(ChatColor.GREEN).style(ChatColor.BOLD).tooltip("§b" + plugin.lang.getTranslation("general_click_here")).command("next");
+		options.send(player);
 		//Rappel commandes
 		player.sendMessage("§7§l§m-----");
     }

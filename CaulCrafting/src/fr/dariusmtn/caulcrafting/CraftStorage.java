@@ -61,7 +61,7 @@ public class CraftStorage implements Listener {
 			int count = 0;
 			for(String craftuuid : craftconfig.getConfigurationSection("Crafts").getKeys(false)) {
 				if(nb == count) {
-					craftconfig.set(craftuuid, null);
+					craftconfig.set("Crafts." + craftuuid, null);
 				}
 				count++;
 			}

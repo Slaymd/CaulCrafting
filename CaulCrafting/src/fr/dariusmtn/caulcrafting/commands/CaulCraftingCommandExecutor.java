@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -123,7 +124,7 @@ public class CaulCraftingCommandExecutor implements CommandExecutor {
 											if(!craftcmd.isEmpty()){
 												if(error == false){
 													player.sendMessage("§d§l➤ " + plugin.lang.getTranslation("craftmaking_thats_right"));
-													plugin.craftFormat.getCraftRecap(craftcmd, "§b" + plugin.lang.getTranslation("craftmaking_craft_typed")).send(player);
+													plugin.craftFormat.getCraftRecap(craftcmd, "§b" + plugin.lang.getTranslation("craftmaking_craft_typed"), false).send(player);
 													player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_craft_confirm_cmd"));
 													plugin.editor.put(player, 3);
 													plugin.craft.put(player, craftcmd);
@@ -145,11 +146,11 @@ public class CaulCraftingCommandExecutor implements CommandExecutor {
 										plugin.editor.put(player, 1);
 										plugin.craft.put(player, new CraftArray());
 										//Explications
+										player.sendMessage(" ");
 										player.sendMessage("§d§l➤ " + plugin.lang.getTranslation("craftmaking_step_1"));
 										player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_step_1_explain"));
 										player.sendMessage("§f§l§m-----");
 										player.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_editor_cmd_exit"));
-										player.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_editor_cmd_removelast"));
 										player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_editor_cmd_next"));
 										player.sendMessage("§d§l§m-----");
 										return true;
@@ -186,7 +187,12 @@ public class CaulCraftingCommandExecutor implements CommandExecutor {
 									player.sendMessage("§d§l§m-----§b(" + plugin.lang.getTranslation("craftlist_page_nb").replace("%number%", "" + page) + ")");
 									for(CraftArray crafts : craftlist){
 										if(count >= mincraft && count <= maxcraft){
-											plugin.craftFormat.getCraftRecap(crafts, "§6§l" + count + ".").send(player);
+											FancyMessage craftrecap = plugin.craftFormat.getCraftRecap(crafts, "§6§l•", false);
+											//Craft removing cross
+											if(player.hasPermission("caulcrafting.admin.remove")) {
+												craftrecap.then(" ").then("[✕]").color(ChatColor.RED).tooltip("§c" + plugin.lang.getTranslation("craftlist_delete_craft")).command("/caulcrafting remove " + count);
+											}
+											craftrecap.send(player);
 										}
 										count++;
 									}
@@ -223,11 +229,13 @@ public class CaulCraftingCommandExecutor implements CommandExecutor {
 									//If craft number is lower than the higher craft number
 									if(craftlist.size()-1 >= nb){
 										CraftArray specraft = craftlist.get(nb);
-										plugin.craftFormat.getCraftRecap(specraft, "§7" + plugin.lang.getTranslation("craftremove_removed")).send(player);
+										plugin.craftFormat.getCraftRecap(specraft, "§7" + plugin.lang.getTranslation("craftremove_removed"), false).send(player);
 										//Removing
 										plugin.craftStorage.removeCraft(nb);
 										//Reload config ;)
 										plugin.reloadConfig();
+										//Display list
+										player.performCommand("cc list");
 										return true;
 									}
 								}
@@ -241,12 +249,9 @@ public class CaulCraftingCommandExecutor implements CommandExecutor {
 					player.sendMessage("§b§lCaulCrafting v" + plugin.getDescription().getVersion() + " §b" + plugin.lang.getTranslation("maincmd_by"));
 					player.sendMessage("§7§l§m-----");
 					player.sendMessage("§6§l" + plugin.lang.getTranslation("maincmd_create").toUpperCase());
-					player.sendMessage("§e/caulcrafting §2create §7§o" + plugin.lang.getTranslation("maincmd_create_easy"));
-					player.sendMessage("§e§o/caulcrafting §2§ocreate §b§o" + plugin.lang.getTranslation("maincmd_create_cmd_args") + " §7§o" + plugin.lang.getTranslation("maincmd_create_fast"));
+					new FancyMessage("§e/caulcrafting §2create").tooltip("§e" + plugin.lang.getTranslation("general_click_here")).command("/caulcrafting create").send(player);
 					player.sendMessage("§7§l" + plugin.lang.getTranslation("maincmd_list").toUpperCase());
-					player.sendMessage("§e/caulcrafting §blist");
-					player.sendMessage("§7§l" + plugin.lang.getTranslation("maincmd_remove").toUpperCase());
-					player.sendMessage("§e/caulcrafting §cremove " + plugin.lang.getTranslation("maincmd_remove_args"));
+					new FancyMessage("§e/caulcrafting §blist").tooltip("§b" + plugin.lang.getTranslation("general_click_here")).command("/caulcrafting list").send(player);
 					player.sendMessage("§7§l§m-----");
 					player.sendMessage("§d§l" + plugin.lang.getTranslation("maincmd_discord"));
 					player.sendMessage("§bhttps://discord.gg/w628upr");

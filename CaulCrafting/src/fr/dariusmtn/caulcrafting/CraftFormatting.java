@@ -17,13 +17,14 @@ public class CraftFormatting implements Listener {
           this.plugin = instance; 
     }
     
-    public FancyMessage getCraftRecap(CraftArray globalcraft, String headtext){
+    public FancyMessage getCraftRecap(CraftArray globalcraft, String headtext, boolean editor){
 		ArrayList<ItemStack> need = globalcraft.getCraft();
 		HashMap<ItemStack,Integer> result = globalcraft.getResult();
 		ArrayList<String> cmds = globalcraft.getCmds();
 		//Elements requis
 		FancyMessage formcraft = new FancyMessage(headtext + "§r" + (headtext == "" ? "" : " "));
 		boolean first = true;
+		int count = 0;
 		if(!need.isEmpty()){
 			for(ItemStack item : need){
 				String name = getName(item);
@@ -31,13 +32,17 @@ public class CraftFormatting implements Listener {
 				if(item.hasItemMeta() && item.getItemMeta().hasEnchants()) {
 					formcraft.then(" ").then("ℇ").color(ChatColor.LIGHT_PURPLE).style(ChatColor.BOLD).tooltip("§b" + plugin.lang.getTranslation("general_enchanted"));
 				}
+				if(editor == true)
+					formcraft.then(" ").then("✕").color(ChatColor.RED).tooltip("§b" + plugin.lang.getTranslation("craftmaking_delete_item")).command("/caulcraftingconfig delitem " + count + " craft");
 				formcraft.then("§r");
 				first = false;
+				count++;
 			}
 		} else {
 			formcraft.then(plugin.lang.getTranslation("general_undefined")).color(ChatColor.GRAY).style(ChatColor.ITALIC);
 		}
 		first = true;
+		count = 0;
 		formcraft.then(" ").then("--").color(ChatColor.YELLOW).style(ChatColor.BOLD).style(ChatColor.STRIKETHROUGH).then(">").color(ChatColor.YELLOW).style(ChatColor.BOLD).then(" §r");
 		//Elements donnés 
 		if(!result.isEmpty()){
@@ -52,14 +57,18 @@ public class CraftFormatting implements Listener {
 					String luckStr = (String.valueOf(luck) + " ").replace(".0 ", "").replace(" ", "");
 					formcraft.then(" ").then("☘").color(ChatColor.YELLOW).tooltip("§e" + plugin.lang.getTranslation("general_drop_chance").replace("%chance%", "§6§l" + luckStr));
 				}
+				if(editor == true)
+					formcraft.then(" ").then("✕").color(ChatColor.RED).tooltip("§b" + plugin.lang.getTranslation("craftmaking_delete_item")).command("/caulcraftingconfig delitem " + count + " result");
 				formcraft.then("§r");
 				first = false;
+				count++;
 			}
 		} else {
 			first = true;
 			if(cmds.isEmpty())
 				formcraft.then(plugin.lang.getTranslation("general_undefined")).color(ChatColor.GRAY).style(ChatColor.ITALIC);
 		}
+		count = 0;
 		if(!cmds.isEmpty()) {
 			for(String cmd : cmds){
 				String[] cmdsplit = cmd.split(" ");

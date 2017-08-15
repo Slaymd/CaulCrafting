@@ -59,43 +59,16 @@ public class AsyncPlayerChatListener implements Listener {
 						plugin.editorUtils.addItem(player, item, mode);
 					}
 				}
-				//supprimer le dernier
-				else if(msg.equalsIgnoreCase("removelast")){
-					if(globalcraft != null){
-						ItemStack torem = null;
-						if(mode == "craft") {
-							//Getting last item added
-							torem = globalcraft.getCraft().get(globalcraft.getCraft().size()-1);
-							//Removing item
-							globalcraft.removeCraftItem(torem);
-							plugin.craft.put(player, globalcraft);
-						} else {
-							//Getting last item added
-							torem = globalcraft.getResultItems().get(globalcraft.getResultItems().size()-1);
-							//Removing item
-							globalcraft.removeResultItem(torem);
-							plugin.craft.put(player, globalcraft);
-						}
-						//Messages
-						//Affichage du nom
-						String name = plugin.craftFormat.getName(torem);
-						player.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_item_removed") + " §c§m" + name);
-						//Recap
-						plugin.craftFormat.getCraftRecap(globalcraft, "§e" + plugin.lang.getTranslation("craftmaking_craft_contents")).send(player);
-						//Rappel commandes
-						player.sendMessage("§7§l§m-----");
-					}
-				}
 				//passer à l'étape suivante
 				else if(msg.equalsIgnoreCase("next")){
 					if(mode == "craft"){ //Passage à l'éditeur de résultat
 						if(!globalcraft.getCraft().isEmpty()){
+							player.sendMessage(" ");
 							player.sendMessage("§d§l➤ " + plugin.lang.getTranslation("craftmaking_step_2"));
 							player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_step_2_explain"));
 							player.sendMessage("§f§l§m-----");
 							player.sendMessage("§b" + plugin.lang.getTranslation("craftmaking_editor_cmd_cmd"));
 							player.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_editor_cmd_exit"));
-							player.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_editor_cmd_removelast"));
 							player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_editor_cmd_next"));
 							player.sendMessage("§d§l§m-----");
 							plugin.editor.put(player, 2);
@@ -104,8 +77,9 @@ public class AsyncPlayerChatListener implements Listener {
 						}
 					} else if(mode == "result"){ //Enregistrement
 						if(!globalcraft.getResult().isEmpty() || !globalcraft.getCmds().isEmpty()){
+							player.sendMessage(" ");
 							player.sendMessage("§a§l➤ " + plugin.lang.getTranslation("craftmaking_step_final"));
-							plugin.craftFormat.getCraftRecap(globalcraft, "§e" + plugin.lang.getTranslation("craftmaking_craft_created")).send(player);
+							plugin.craftFormat.getCraftRecap(globalcraft, "§e" + plugin.lang.getTranslation("craftmaking_craft_created"), false).send(player);
 							plugin.craftStorage.addCraft(globalcraft);
 							plugin.craft.remove(player);
 							plugin.editor.remove(player);
@@ -120,7 +94,6 @@ public class AsyncPlayerChatListener implements Listener {
 					if(mode == "result")
 						player.sendMessage("§b" + plugin.lang.getTranslation("craftmaking_editor_cmd_cmd"));
 					player.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_editor_cmd_exit"));
-					player.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_editor_cmd_removelast"));
 					player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_editor_cmd_next"));
 					player.sendMessage("§7§l§m-----");
 				}
@@ -129,7 +102,7 @@ public class AsyncPlayerChatListener implements Listener {
 					//Craft entré via commande, demande de confirmation
 					if(msg.equalsIgnoreCase("yes")){
 						player.sendMessage("§a§l➤ " + plugin.lang.getTranslation("craftmaking_step_final"));
-						plugin.craftFormat.getCraftRecap(plugin.craft.get(player), "§e" + plugin.lang.getTranslation("craftmaking_craft_created")).send(player);
+						plugin.craftFormat.getCraftRecap(plugin.craft.get(player), "§e" + plugin.lang.getTranslation("craftmaking_craft_created"), false).send(player);
 						plugin.craftStorage.addCraft(plugin.craft.get(player));
 						plugin.craft.remove(player);
 						plugin.editor.remove(player);

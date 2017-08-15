@@ -2,14 +2,12 @@ package fr.dariusmtn.caulcrafting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -118,35 +116,9 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	public HashMap<UUID,Location> caulLoc = new HashMap<UUID,Location>();
 	public HashMap<UUID,ArrayList<ItemStack>> inCaulFin = new HashMap<UUID,ArrayList<ItemStack>>();
 	
-	public Entity[]  getNearbyEntities(Location l, int radius){
-	      int chunkRadius = radius < 16 ? 1 : (radius - (radius % 16))/16;
-	      HashSet<Entity> radiusEntities = new HashSet<Entity>();
-	          for (int chX = 0 -chunkRadius; chX <= chunkRadius; chX ++){
-	              for (int chZ = 0 -chunkRadius; chZ <= chunkRadius; chZ++){
-	                  int x=(int) l.getX(),y=(int) l.getY(),z=(int) l.getZ();
-	                  for (Entity e : new Location(l.getWorld(),x+(chX*16),y,z+(chZ*16)).getChunk().getEntities()){
-	                      if (e.getLocation().distance(l) <= radius && e.getLocation().getBlock() != l.getBlock()) radiusEntities.add(e);
-	                  }
-	              }
-	          }
-	      return radiusEntities.toArray(new Entity[radiusEntities.size()]);
-	  }
-	
 	public void sendDebug(Player player, String msg) {
 		if(getConfig().getBoolean("debug_message") == true) {
 			getLogger().info("CaulCrafting DEBUG " + player.getName() + ": " + msg);
 		}
 	}
-	
-	public void clearVar(final Player player){
-		 Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable(){
-			 public void run(){
-				 sendDebug(player,"STEP5 a/b - starting removing vars");
-				 craftProc.remove(player.getUniqueId());
-				 caulLoc.remove(player.getUniqueId());
-				 inCaulFin.remove(player.getUniqueId());
-				 sendDebug(player,"STEP5 b/b - removing vars succeed");
-			 }
-		 },4);
-	 }
 }
