@@ -23,6 +23,7 @@ import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_12_R1;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_9_R1;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_9_R2;
 import fr.dariusmtn.caulcrafting.listeners.AsyncPlayerChatListener;
+import fr.dariusmtn.caulcrafting.listeners.BlockPistonExtendListener;
 import fr.dariusmtn.caulcrafting.listeners.ItemDropListener;
 
 public class CaulCrafting extends JavaPlugin implements Listener {
@@ -47,6 +48,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		PluginManager plugman = getServer().getPluginManager();
 		plugman.registerEvents(new AsyncPlayerChatListener(this), this);
 		plugman.registerEvents(new ItemDropListener(this), this);
+		plugman.registerEvents(new BlockPistonExtendListener(this), this);
 		//Setup languages
 		languagesAvailable.put("en", "English");
 		languagesAvailable.put("fr", "Français");
@@ -58,6 +60,8 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		languagesAvailable.put("vi", "Tiếng Việt");
 		languagesAvailable.put("es", "Español");
 		languagesAvailable.put("pt", "Português");
+		languagesAvailable.put("zh", "中文");
+		languagesAvailable.put("hu", "Magyar");
 		//Defaults configs files (locales..)
 		configUtils.setupDefaults();
 		//Load defaults configs if empty
