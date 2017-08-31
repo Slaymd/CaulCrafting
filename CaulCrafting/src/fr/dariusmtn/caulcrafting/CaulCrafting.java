@@ -24,6 +24,7 @@ import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_9_R1;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_9_R2;
 import fr.dariusmtn.caulcrafting.listeners.AsyncPlayerChatListener;
 import fr.dariusmtn.caulcrafting.listeners.BlockPistonExtendListener;
+import fr.dariusmtn.caulcrafting.listeners.BlockPistonRetractListener;
 import fr.dariusmtn.caulcrafting.listeners.ItemDropListener;
 
 public class CaulCrafting extends JavaPlugin implements Listener {
@@ -49,6 +50,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		plugman.registerEvents(new AsyncPlayerChatListener(this), this);
 		plugman.registerEvents(new ItemDropListener(this), this);
 		plugman.registerEvents(new BlockPistonExtendListener(this), this);
+		plugman.registerEvents(new BlockPistonRetractListener(this), this);
 		//Setup languages
 		languagesAvailable.put("en", "English");
 		languagesAvailable.put("fr", "Français");
