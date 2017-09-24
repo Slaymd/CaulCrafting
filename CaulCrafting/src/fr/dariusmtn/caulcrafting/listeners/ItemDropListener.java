@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -88,7 +89,14 @@ public class ItemDropListener implements Listener {
 						plugin.sendDebug(player,"API : CaulCraftDroppingEvent");
 						CaulCraftDroppingEvent ccEvent = new CaulCraftDroppingEvent(player, caul, Particle.SPELL_MOB, Sound.BLOCK_BREWING_STAND_BREW);
 						plugin.getServer().getPluginManager().callEvent(ccEvent);
-						
+						//fire under (option)
+						boolean fireoption = plugin.getConfig().getBoolean("need_fire");
+						if(fireoption == true) {
+							Block blockunder = caul.getRelative(BlockFace.DOWN);
+							//if block under isnt "fire" type
+							if(blockunder.getType() != Material.FIRE)
+								return;
+						}
 						//contain water
 						if(caul.getData() > 0 && !ccEvent.isCancelled() && player.hasPermission("caulcrafting.use")){
 							if(!plugin.caulLoc.containsKey(player.getUniqueId()))

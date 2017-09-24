@@ -77,7 +77,11 @@ public class ConfigUpdate implements Listener {
 			}
 			
 		}
-		
+		//Màj config V3 : add fire option
+		if(plugin.getConfig().getInt("config_version") == 3) {
+			//reset config.yml
+			plugin.saveResource("config.yml", true);
+		}
 		
 	}
 

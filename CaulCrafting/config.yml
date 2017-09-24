@@ -1,9 +1,12 @@
 #Config version, it's only serve to convert with a config update in the future <3 
-config_version: 3
+config_version: 4
 
 #Display all the plugin actions on logs
 debug_message: false
 
 #What language do you want to use ? ;)
 #Check "config_locale.yml"
+
+#Requires fire under cauldrons ?
+need_fire: false
 
