@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/Spigot 1.10.jar"/>
+	<classpathentry kind="lib" path="lib/Spigot-1.11.2.jar"/>
+	<classpathentry kind="lib" path="lib/spigot-1.12.jar"/>
+	<classpathentry kind="lib" path="lib/spigot-1.9-R0.1-SNAPSHOT-latest.jar"/>
+	<classpathentry kind="lib" path="lib/spigot-1.9.4-R0.1-SNAPSHOT-latest.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

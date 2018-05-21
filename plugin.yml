@@ -1,0 +1,34 @@
+main: fr.dariusmtn.caulcrafting.CaulCrafting
+version: 5.3
+name: CaulCrafting
+author: Slaymd
+commands:
+  caulcrafting:
+    description: CaulCrafting main command.
+    aliases: [cc,cauldroncrafting]
+  caulcraftingconfig:
+    description: CaulCrafting config command.
+    aliases: [c3,ccc]
+permissions:
+  caulcrafting.use:
+    description: Allows you to use the cauldron crafting system
+    default: true
+  caulcrafting.nowaterconsume:
+    description: Allows you to craft without consuming water layer
+    default: false
+  caulcrafting.admin.*:
+    description: Gives access to all caulcrafting admin commands
+    children:
+      caulcrafting.admin.list: true
+      caulcrafting.admin.create: true
+      caulcrafting.admin.remove: true
+  caulcrafting.admin.list:
+    description: Allows you to show the craft list
+    default: op
+  caulcrafting.admin.create:
+    description: Allows you to create new cauldron crafts
+    default: op
+  caulcrafting.admin.remove:
+    description: Allows you to remove a specified craft
+    default: op
+
