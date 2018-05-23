@@ -1,33 +1,29 @@
 package fr.dariusmtn.caulcrafting.commands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import fr.dariusmtn.caulcrafting.CaulCrafting;
-import fr.dariusmtn.caulcrafting.CraftArray;
 import mkremins.fanciful.FancyMessage;
 
 public class CaulCraftingCommandExecutor implements CommandExecutor {
 
 	private CaulCrafting plugin;
+	private Player player;
     public CaulCraftingCommandExecutor(CaulCrafting instance) {
           this.plugin = instance; 
     }
     
-    private boolean checkIfNeedLanguageSelection(Player player) {
+    private boolean checkIfNeedLanguageSelection() {
     	if (!plugin.lang.getExactLanguage().equalsIgnoreCase("default"))
     		return true;
     	//First load
-    	if (!player.isOp()) {
+    	if (player == null || !player.isOp()) {
     		player.sendMessage("§cThe plugin need to be initialized by an OP player");
     		return false;
     	}
@@ -41,26 +37,49 @@ public class CaulCraftingCommandExecutor implements CommandExecutor {
 			.command("/caulcraftingconfig setlang " + loc)
 			.send(player);
 		}
-		return true;
+		return false;
+    }
+    
+    private void displayHelp() {
+    	player.sendMessage("§b§lCaulCrafting v" + plugin.getDescription().getVersion() + " §b" + plugin.lang.getTranslation("maincmd_by"));
+		player.sendMessage("§7§l§m-----");
+		player.sendMessage("§6§l" + plugin.lang.getTranslation("maincmd_create").toUpperCase());
+		new FancyMessage("§e/caulcrafting §2create").tooltip("§e" + plugin.lang.getTranslation("general_click_here")).command("/caulcrafting create").send(player);
+		player.sendMessage("§7§l" + plugin.lang.getTranslation("maincmd_list").toUpperCase());
+		new FancyMessage("§e/caulcrafting §blist").tooltip("§b" + plugin.lang.getTranslation("general_click_here")).command("/caulcrafting list").send(player);
+		player.sendMessage("§7§l§m-----");
+		player.sendMessage("§d§l" + plugin.lang.getTranslation("maincmd_discord"));
+		player.sendMessage("§bhttps://discord.gg/w628upr");
     }
     
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		Player player = null;
+		Map<String, Runnable> subcmds = new HashMap<>();
 
+		subcmds.put("create", () -> new CreateCraftCommand(plugin).createCommand(player, args));
 		//Is caulcrafting command (aliases are replaced by spigot before this call)
 		if (cmd.getName() == null || !cmd.getName().equalsIgnoreCase("caulcrafting"))
 			return false;
 		//Getting player
 		if (sender instanceof Player)
 			player = (Player)sender;
-		else
+		else {
+			sender.sendMessage("§cThis command needs to be executed by a real player!");
 			return false;
+		}
 		//Checking if need language selection (first load)
-		if (!this.checkIfNeedLanguageSelection(player))
+		if (!this.checkIfNeedLanguageSelection())
 			return false;
-		
-		return false;
+		if (args.length > 0) {
+			for (String subcmd : subcmds.keySet()) {
+				if (subcmd.equalsIgnoreCase(args[0])) {
+					subcmds.get(subcmd).run();
+					return true;
+				}
+			}
+		}
+		this.displayHelp();
+		return true;
 	}
 	
     
