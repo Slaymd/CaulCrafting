@@ -17,6 +17,42 @@ public class CreateCraftCommand {
           this.plugin = instance; 
     }
     
+    private void dispEditorMessage(Player player, int nbTitleStrings, String... strings) {
+    	boolean title = false;
+ 
+    	for (String str : strings) {
+    		if (nbTitleStrings > 0 && !title) {
+        		//Title
+    			player.sendMessage(" ");
+    			player.sendMessage("§d§l➤ " + str);
+    			title = true;
+    		} else if (nbTitleStrings > 0)
+    			player.sendMessage("§e" + str);
+    		else
+    			player.sendMessage(str.equals("---") ? "§f§l§m-----" : "§7" + str);
+    		nbTitleStrings--;
+    	}
+    }
+    
+    private void initCreateEditor(Player player) {
+    	//Listes éditeur
+		plugin.editor.put(player, 1);
+		plugin.craft.put(player, new CraftArray());
+		//Explications
+		this.dispEditorMessage(player, 2, plugin.lang.getTranslation("craftmaking_step_1"),
+				plugin.lang.getTranslation("craftmaking_step_1_explain"),
+				"---", plugin.lang.getTranslation("craftmaking_editor_cmd_exit"),
+				plugin.lang.getTranslation("craftmaking_editor_cmd_next"),
+				"---");
+		/*player.sendMessage(" ");
+		player.sendMessage("§d§l➤ " + plugin.lang.getTranslation("craftmaking_step_1"));
+		player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_step_1_explain"));
+		player.sendMessage("§f§l§m-----");
+		player.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_editor_cmd_exit"));
+		player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_editor_cmd_next"));
+		player.sendMessage("§d§l§m-----");*/
+    }
+    
     @SuppressWarnings("deprecation")
 	public boolean createCommand(Player player, String[] args) {
     	if (player == null)
@@ -116,17 +152,7 @@ public class CreateCraftCommand {
 			return false;
 		}
 		if(!plugin.editor.containsKey(player)){
-			//Listes éditeur
-			plugin.editor.put(player, 1);
-			plugin.craft.put(player, new CraftArray());
-			//Explications
-			player.sendMessage(" ");
-			player.sendMessage("§d§l➤ " + plugin.lang.getTranslation("craftmaking_step_1"));
-			player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_step_1_explain"));
-			player.sendMessage("§f§l§m-----");
-			player.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_editor_cmd_exit"));
-			player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_editor_cmd_next"));
-			player.sendMessage("§d§l§m-----");
+			this.initCreateEditor(player);
 			return true;
 		}
 		player.sendMessage("§c" + plugin.lang.getTranslation("craftmaking_already_in"));
