@@ -9,6 +9,8 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.dariusmtn.caulcrafting.CaulCrafting;
 import fr.dariusmtn.caulcrafting.CraftArray;
+import fr.dariusmtn.editor.Editor;
+import fr.dariusmtn.editor.PlayerEditor;
 import mkremins.fanciful.FancyMessage;
 
 public class AsyncPlayerChatListener implements Listener {
@@ -22,20 +24,23 @@ public class AsyncPlayerChatListener implements Listener {
 	public void onPlayerChat(AsyncPlayerChatEvent e){
 		Player player = e.getPlayer();
 		String msg = e.getMessage();
+		Editor editor;
+		
 		//S'il est dans l'éditeur
-		if(plugin.editor.containsKey(player)){
+		if (PlayerEditor.isInEditor(player)) {
+			editor = PlayerEditor.getEditor(player);
 			e.setCancelled(true);
-			int editorstep = plugin.editor.get(player);
+			int editorstep = editor.getStep();
 			if(editorstep < 3){
 				//Getting craft
-				CraftArray globalcraft = plugin.craft.get(player);
+				CraftArray globalcraft = editor.getCraft();
 				//Setting mode
 				String mode = "craft";
 				if(editorstep == 2)
 					mode = "result";
 				//Leave editor
 				if(msg.equalsIgnoreCase("exit")){
-					plugin.editor.remove(player);
+					PlayerEditor.exitEditor(player);
 					player.sendMessage("§c" + plugin.lang.getTranslation("craftmaking_editor_left"));
 				}
 				//Adding command

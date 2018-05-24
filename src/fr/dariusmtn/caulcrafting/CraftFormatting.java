@@ -79,9 +79,9 @@ public class CraftFormatting implements Listener {
 		return formcraft;
 	}
 	
-	public String getName(ItemStack stack) {
-		if(plugin.nmsItemsName == true){
-			return plugin.getItemsname().getItemStackName(stack);
+	public static String getName(ItemStack stack) {
+		if(CaulCrafting.nmsItemsName == true){
+			return CaulCrafting.getItemsname().getItemStackName(stack);
 		} else {
 			String name = "";
 			name = stack.getType().toString();

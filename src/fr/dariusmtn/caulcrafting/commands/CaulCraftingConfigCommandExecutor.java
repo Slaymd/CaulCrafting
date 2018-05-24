@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.dariusmtn.caulcrafting.CaulCrafting;
 import fr.dariusmtn.caulcrafting.CraftArray;
+import fr.dariusmtn.editor.PlayerEditor;
 import mkremins.fanciful.FancyMessage;
 
 public class CaulCraftingConfigCommandExecutor implements CommandExecutor{
@@ -21,6 +22,11 @@ public class CaulCraftingConfigCommandExecutor implements CommandExecutor{
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		Player player;
+		
+		if (!(sender instanceof Player))
+			return false;
+		player = (Player)sender;
 		//Config command (internal)
 		if(cmd.getName().equalsIgnoreCase("caulcraftingconfig")) {
 			if(args.length > 0) {
@@ -28,8 +34,7 @@ public class CaulCraftingConfigCommandExecutor implements CommandExecutor{
 					if(args.length == 2 && plugin.languagesAvailable.containsKey(args[1])) {
 						String oldlang = plugin.lang.getExactLanguage();
 						plugin.lang.setLanguage(args[1]);
-						if(sender instanceof Player && oldlang.equalsIgnoreCase("default")) {
-							Player player = (Player)sender;
+						if(oldlang.equalsIgnoreCase("default")) {
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 0);
 							player.sendMessage("§d§l➤ " + plugin.lang.getTranslation("welcome_lets_start_something"));
 							new FancyMessage(" §e•§2§l " + plugin.lang.getTranslation("welcome_create_craft")).tooltip("§b" + plugin.lang.getTranslation("general_click_here")).command("/caulcrafting create").send(player);
@@ -38,14 +43,14 @@ public class CaulCraftingConfigCommandExecutor implements CommandExecutor{
 					}
 					return false;
 				}else if(args[0].equalsIgnoreCase("setdropchance")) {
-					if(args.length == 3 && plugin.editor.containsKey(sender)) {
+					if(args.length == 3 && PlayerEditor.isInEditor(player)) {
 						if(Integer.valueOf(args[1]) != null) {
 							int itemnb = Integer.valueOf(args[1]);
-							CraftArray editcraft = plugin.craft.get(sender);
+							CraftArray editcraft = CaulCrafting.editors.get(player.getUniqueId()).getCraft();
 							if(editcraft.getResultItems().get(itemnb) != null) {
 								if(Double.valueOf(args[2]) != null) {
 									double prob = Double.valueOf(args[2]);
-									editcraft.addResultItem(plugin.craft.get(sender).getResultItems().get(itemnb),prob);
+									editcraft.addResultItem(editcraft.getResultItems().get(itemnb),prob);
 									plugin.craftFormat.getCraftRecap(editcraft, "§e" + plugin.lang.getTranslation("craftmaking_craft_contents"), true).send(sender);
 									sender.sendMessage("§7§l§m-----");
 								}
@@ -56,10 +61,10 @@ public class CaulCraftingConfigCommandExecutor implements CommandExecutor{
 				//Editor : delete item
 				}else if(args[0].equalsIgnoreCase("delitem")) {
 					if(args.length == 3) {
-						if(plugin.editor.containsKey(sender)) {
+						if(PlayerEditor.isInEditor(player)) {
 							if(Integer.valueOf(args[1]) != null) {
 								int itemnb = Integer.valueOf(args[1]);
-								CraftArray editcraft = plugin.craft.get(sender);
+								CraftArray editcraft = PlayerEditor.getEditorCraft(player);
 								if(args[2].equalsIgnoreCase("craft")) {
 									ItemStack itemtodel = editcraft.getCraft().get(itemnb);
 									editcraft.removeCraftItem(itemtodel);
@@ -74,43 +79,45 @@ public class CaulCraftingConfigCommandExecutor implements CommandExecutor{
 					}
 				//Editor : add player cmd
 				}else if(args[0].equalsIgnoreCase("addplayercmd") || args[0].equalsIgnoreCase("addconsolecmd")) {
-					if(plugin.editor.containsKey(sender)) {
+					if(PlayerEditor.isInEditor(player)) {
 						String mode = (args[0].equalsIgnoreCase("addplayercmd") ? "plcmd" : "opcmd");
+						CraftArray editcraft = PlayerEditor.getEditorCraft(player);
 						//Getting cmd by args
 						String cmdsen = "";
 						for(String arg : args) {
 							cmdsen += arg + " ";
 						}
 						cmdsen = cmdsen.replace(args[0] + " ", "");
-						if(!plugin.craft.get(sender).getCmds().contains("opcmd" + cmdsen) && !plugin.craft.get(sender).getCmds().contains("plcmd" + cmdsen)) {
+						if(!editcraft.getCmds().contains("opcmd" + cmdsen) && !editcraft.getCmds().contains("plcmd" + cmdsen)) {
 							//Adding command
 							sender.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_cmd_added") + "§a " + cmdsen);
-							plugin.craft.get(sender).addCmd(mode + cmdsen);
+							editcraft.addCmd(mode + cmdsen);
 							//Delete option
 							new FancyMessage("§3" + plugin.lang.getTranslation("craftmaking_craft_options") + " ").then("[" + plugin.lang.getTranslation("craftmaking_cmd_delete") + "]")
 							.color(ChatColor.RED).tooltip("§b" + plugin.lang.getTranslation("general_click_here")).suggest("/ccc " + (mode == "plcmd" ? "delplayercmd" : "delconsolecmd") + " " + cmdsen).send(sender);
 							//Craft recap
-							plugin.craftFormat.getCraftRecap(plugin.craft.get(sender), "§e" + plugin.lang.getTranslation("craftmaking_craft_contents"), true).send(sender);
+							plugin.craftFormat.getCraftRecap(editcraft, "§e" + plugin.lang.getTranslation("craftmaking_craft_contents"), true).send(sender);
 							sender.sendMessage("§7§l§m-----");
 						}
 					}
 					return false;
 				//Editor : delete player cmd
 				}else if(args[0].equalsIgnoreCase("delplayercmd") || args[0].equalsIgnoreCase("delconsolecmd")) {
-					if(plugin.editor.containsKey(sender)) {
+					if(PlayerEditor.isInEditor(player)) {
 						String mode = (args[0].equalsIgnoreCase("delplayercmd") ? "plcmd" : "opcmd");
+						CraftArray editcraft = PlayerEditor.getEditorCraft(player);
 						//Getting cmd by args
 						String cmdsen = "";
 						for(String arg : args) {
 							cmdsen += arg + " ";
 						}
 						cmdsen = cmdsen.replace(args[0] + " ", "");
-						if(plugin.craft.get(sender).getCmds().contains(mode + cmdsen)) {
+						if(editcraft.getCmds().contains(mode + cmdsen)) {
 							//Removing command
 							sender.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_cmd_deleted") + "§c§m " + cmdsen);
-							plugin.craft.get(sender).removeCmd(mode + cmdsen);
+							editcraft.removeCmd(mode + cmdsen);
 							//Craft recap
-							plugin.craftFormat.getCraftRecap(plugin.craft.get(sender), "§e" + plugin.lang.getTranslation("craftmaking_craft_contents"), true).send(sender);
+							plugin.craftFormat.getCraftRecap(editcraft, "§e" + plugin.lang.getTranslation("craftmaking_craft_contents"), true).send(sender);
 							sender.sendMessage("§7§l§m-----");
 						}
 					}

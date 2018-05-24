@@ -2,6 +2,7 @@ package fr.dariusmtn.caulcrafting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -26,15 +27,19 @@ import fr.dariusmtn.caulcrafting.listeners.AsyncPlayerChatListener;
 import fr.dariusmtn.caulcrafting.listeners.BlockPistonExtendListener;
 import fr.dariusmtn.caulcrafting.listeners.BlockPistonRetractListener;
 import fr.dariusmtn.caulcrafting.listeners.ItemDropListener;
+import fr.dariusmtn.editor.Editor;
 
 public class CaulCrafting extends JavaPlugin implements Listener {
+	
+	//Editors working
+	public static Map<UUID,Editor> editors = new HashMap<>();
 	
 	public ConfigUpdate configUpdate = new ConfigUpdate(this);
 	public Config configUtils = new Config(this);
 	public Language lang = new Language(this);
 	public CraftStorage craftStorage = new CraftStorage(this);
 	public CraftFormatting craftFormat = new CraftFormatting(this);
-	public Editor editorUtils = new Editor(this);
+	//public Editor editorUtils = new Editor(this);
 	
 	//Languages availables list 
 	public HashMap<String, String> languagesAvailable = new HashMap<String,String>();
@@ -89,10 +94,10 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	    }));
 	} 
 	
-	Itemsname itemsname = null;
-	boolean nmsItemsName = false;
+	static Itemsname itemsname = null;
+	public static boolean nmsItemsName = false;
 	
-	public Itemsname getItemsname(){
+	public static Itemsname getItemsname(){
 		return itemsname;
 	}
 	
@@ -118,8 +123,8 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		return itemsname != null;
 	}
 	
-	public HashMap<Player,Integer> editor = new HashMap<Player,Integer>();
-	public HashMap<Player,CraftArray> craft = new HashMap<Player,CraftArray>();
+	/*public HashMap<Player,Integer> editor = new HashMap<Player,Integer>();
+	public HashMap<Player,CraftArray> craft = new HashMap<Player,CraftArray>();*/
 	
 	public ArrayList<UUID> craftProc = new ArrayList<UUID>();
 	public HashMap<UUID,Location> caulLoc = new HashMap<UUID,Location>();
@@ -130,4 +135,5 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 			getLogger().info("CaulCrafting DEBUG " + player.getName() + ": " + msg);
 		}
 	}
+
 }
