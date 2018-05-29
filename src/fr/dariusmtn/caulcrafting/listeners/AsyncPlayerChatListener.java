@@ -9,6 +9,10 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.dariusmtn.caulcrafting.CaulCrafting;
 import fr.dariusmtn.caulcrafting.CraftArray;
+import fr.dariusmtn.caulcrafting.CraftFormatting;
+import fr.dariusmtn.caulcrafting.Language;
+import fr.dariusmtn.editor.Editor;
+import fr.dariusmtn.editor.PlayerEditor;
 import mkremins.fanciful.FancyMessage;
 
 public class AsyncPlayerChatListener implements Listener {
@@ -22,21 +26,24 @@ public class AsyncPlayerChatListener implements Listener {
 	public void onPlayerChat(AsyncPlayerChatEvent e){
 		Player player = e.getPlayer();
 		String msg = e.getMessage();
+		Editor editor;
+		
 		//S'il est dans l'éditeur
-		if(plugin.editor.containsKey(player)){
+		if (PlayerEditor.isInEditor(player)) {
+			editor = PlayerEditor.getEditor(player);
 			e.setCancelled(true);
-			int editorstep = plugin.editor.get(player);
+			int editorstep = editor.getStep();
 			if(editorstep < 3){
 				//Getting craft
-				CraftArray globalcraft = plugin.craft.get(player);
+				CraftArray globalcraft = editor.getCraft();
 				//Setting mode
 				String mode = "craft";
 				if(editorstep == 2)
 					mode = "result";
 				//Leave editor
 				if(msg.equalsIgnoreCase("exit")){
-					plugin.editor.remove(player);
-					player.sendMessage("§c" + plugin.lang.getTranslation("craftmaking_editor_left"));
+					PlayerEditor.exitEditor(player);
+					player.sendMessage("§c" + Language.getTranslation("craftmaking_editor_left"));
 				}
 				//Adding command
 				else if(msg.startsWith("cmd ")) {
@@ -44,10 +51,10 @@ public class AsyncPlayerChatListener implements Listener {
 						String cmd = msg.replace("cmd ", "");
 						if(!cmd.startsWith("/"))
 							cmd = "/" + cmd;
-						new FancyMessage("§e" + plugin.lang.getTranslation("craftmaking_cmd_whosend") + " ").then("[" + plugin.lang.getTranslation("craftmaking_cmd_console") + "]")
-						.color(ChatColor.GOLD).tooltip("§b" + plugin.lang.getTranslation("general_click_here")).command("/ccc addconsolecmd " + cmd).then(" ")
-						.then("[" + plugin.lang.getTranslation("craftmaking_cmd_player") + "]")
-						.color(ChatColor.GOLD).tooltip("§b" + plugin.lang.getTranslation("general_click_here")).command("/ccc addplayercmd " + cmd).send(player);
+						new FancyMessage("§e" + Language.getTranslation("craftmaking_cmd_whosend") + " ").then("[" + Language.getTranslation("craftmaking_cmd_console") + "]")
+						.color(ChatColor.GOLD).tooltip("§b" + Language.getTranslation("general_click_here")).command("/ccc addconsolecmd " + cmd).then(" ")
+						.then("[" + Language.getTranslation("craftmaking_cmd_player") + "]")
+						.color(ChatColor.GOLD).tooltip("§b" + Language.getTranslation("general_click_here")).command("/ccc addplayercmd " + cmd).send(player);
 						player.sendMessage("§7§l§m-----");
 					}
 				}
@@ -56,7 +63,7 @@ public class AsyncPlayerChatListener implements Listener {
 					ItemStack item = player.getInventory().getItemInMainHand();
 					if(item != null){
 						//Add item
-						plugin.editorUtils.addItem(player, item, mode);
+						editor.addItem(player, item);
 					}
 				}
 				//passer à l'étape suivante
@@ -64,53 +71,50 @@ public class AsyncPlayerChatListener implements Listener {
 					if(mode == "craft"){ //Passage à l'éditeur de résultat
 						if(!globalcraft.getCraft().isEmpty()){
 							player.sendMessage(" ");
-							player.sendMessage("§d§l➤ " + plugin.lang.getTranslation("craftmaking_step_2"));
-							player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_step_2_explain"));
+							player.sendMessage("§d§l➤ " + Language.getTranslation("craftmaking_step_2"));
+							player.sendMessage("§e" + Language.getTranslation("craftmaking_step_2_explain"));
 							player.sendMessage("§f§l§m-----");
-							player.sendMessage("§b" + plugin.lang.getTranslation("craftmaking_editor_cmd_cmd"));
-							player.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_editor_cmd_exit"));
-							player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_editor_cmd_next"));
+							player.sendMessage("§b" + Language.getTranslation("craftmaking_editor_cmd_cmd"));
+							player.sendMessage("§7" + Language.getTranslation("craftmaking_editor_cmd_exit"));
+							player.sendMessage("§e" + Language.getTranslation("craftmaking_editor_cmd_next"));
 							player.sendMessage("§d§l§m-----");
-							plugin.editor.put(player, 2);
+							editor.setStep(2);
 						} else {
-							player.sendMessage("§c" + plugin.lang.getTranslation("craftmaking_step_1_add_items"));
+							player.sendMessage("§c" + Language.getTranslation("craftmaking_step_1_add_items"));
 						}
 					} else if(mode == "result"){ //Enregistrement
 						if(!globalcraft.getResult().isEmpty() || !globalcraft.getCmds().isEmpty()){
 							player.sendMessage(" ");
-							player.sendMessage("§a§l➤ " + plugin.lang.getTranslation("craftmaking_step_final"));
-							plugin.craftFormat.getCraftRecap(globalcraft, "§e" + plugin.lang.getTranslation("craftmaking_craft_created"), false).send(player);
+							player.sendMessage("§a§l➤ " + Language.getTranslation("craftmaking_step_final"));
+							CraftFormatting.getCraftRecap(globalcraft, "§e" + Language.getTranslation("craftmaking_craft_created"), false).send(player);
 							plugin.craftStorage.addCraft(globalcraft);
-							plugin.craft.remove(player);
-							plugin.editor.remove(player);
+							PlayerEditor.exitEditor(player);
 							plugin.reloadConfig();
 						} else {
-							player.sendMessage("§c" + plugin.lang.getTranslation("craftmaking_step_2_add_items"));
+							player.sendMessage("§c" + Language.getTranslation("craftmaking_step_2_add_items"));
 						}
 					}
 				} else {
 					player.sendMessage("§7§l§m-----");
-					player.sendMessage("§b" + plugin.lang.getTranslation("craftmaking_editor_cmd_add"));
+					player.sendMessage("§b" + Language.getTranslation("craftmaking_editor_cmd_add"));
 					if(mode == "result")
-						player.sendMessage("§b" + plugin.lang.getTranslation("craftmaking_editor_cmd_cmd"));
-					player.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_editor_cmd_exit"));
-					player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_editor_cmd_next"));
+						player.sendMessage("§b" + Language.getTranslation("craftmaking_editor_cmd_cmd"));
+					player.sendMessage("§7" + Language.getTranslation("craftmaking_editor_cmd_exit"));
+					player.sendMessage("§e" + Language.getTranslation("craftmaking_editor_cmd_next"));
 					player.sendMessage("§7§l§m-----");
 				}
 			} else {
 				if(editorstep == 3){
 					//Craft entré via commande, demande de confirmation
 					if(msg.equalsIgnoreCase("yes")){
-						player.sendMessage("§a§l➤ " + plugin.lang.getTranslation("craftmaking_step_final"));
-						plugin.craftFormat.getCraftRecap(plugin.craft.get(player), "§e" + plugin.lang.getTranslation("craftmaking_craft_created"), false).send(player);
-						plugin.craftStorage.addCraft(plugin.craft.get(player));
-						plugin.craft.remove(player);
-						plugin.editor.remove(player);
+						player.sendMessage("§a§l➤ " + Language.getTranslation("craftmaking_step_final"));
+						CraftFormatting.getCraftRecap(editor.getCraft(), "§e" + Language.getTranslation("craftmaking_craft_created"), false).send(player);
+						plugin.craftStorage.addCraft(editor.getCraft());
+						PlayerEditor.exitEditor(player);
 						plugin.reloadConfig();
 					} else if(msg.equalsIgnoreCase("no")){
-						plugin.craft.remove(player);
-						plugin.editor.remove(player);
-						player.sendMessage("§c" + plugin.lang.getTranslation("craftmaking_canceled"));
+						PlayerEditor.exitEditor(player);
+						player.sendMessage("§c" + Language.getTranslation("craftmaking_canceled"));
 					}
 				}
 			}

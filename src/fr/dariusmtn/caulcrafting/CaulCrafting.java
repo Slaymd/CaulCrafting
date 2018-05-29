@@ -1,7 +1,9 @@
 package fr.dariusmtn.caulcrafting;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -26,15 +28,20 @@ import fr.dariusmtn.caulcrafting.listeners.AsyncPlayerChatListener;
 import fr.dariusmtn.caulcrafting.listeners.BlockPistonExtendListener;
 import fr.dariusmtn.caulcrafting.listeners.BlockPistonRetractListener;
 import fr.dariusmtn.caulcrafting.listeners.ItemDropListener;
+import fr.dariusmtn.editor.Editor;
 
 public class CaulCrafting extends JavaPlugin implements Listener {
 	
+	//Editors working
+	public static Map<UUID,Editor> editors = new HashMap<>();
+	
+	//Data folder
+	public static File dataFolder = null;
+	
 	public ConfigUpdate configUpdate = new ConfigUpdate(this);
 	public Config configUtils = new Config(this);
-	public Language lang = new Language(this);
 	public CraftStorage craftStorage = new CraftStorage(this);
-	public CraftFormatting craftFormat = new CraftFormatting(this);
-	public Editor editorUtils = new Editor(this);
+	//public Editor editorUtils = new Editor(this);
 	
 	//Languages availables list 
 	public HashMap<String, String> languagesAvailable = new HashMap<String,String>();
@@ -42,6 +49,8 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable(){
 		ConfigurationSerialization.registerClass(CraftArray.class);
+		//Save data folder
+		CaulCrafting.dataFolder = this.getDataFolder();
 		//Commands executors
 		this.getCommand("caulcrafting").setExecutor(new CaulCraftingCommandExecutor(this));
 		this.getCommand("caulcraftingconfig").setExecutor(new CaulCraftingConfigCommandExecutor(this));
@@ -75,8 +84,8 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		if(setupItemsname()){
 			nmsItemsName = true;
 		} else {
-			getLogger().severe(lang.getTranslation("updater_warn_1"));
-			getLogger().severe(lang.getTranslation("updater_warn_2"));
+			getLogger().severe(Language.getTranslation("updater_warn_1"));
+			getLogger().severe(Language.getTranslation("updater_warn_2"));
 			nmsItemsName = false;
 		}
 		//Stats (bstats) https://bstats.org/plugin/bukkit/CaulCrafting
@@ -84,15 +93,15 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		metrics.addCustomChart(new Metrics.SimplePie("used_languages", new Callable<String>() {
 	        @Override
 	        public String call() throws Exception {
-	            return lang.getLanguage();
+	            return Language.getLanguage();
 	        }
 	    }));
 	} 
 	
-	Itemsname itemsname = null;
-	boolean nmsItemsName = false;
+	static Itemsname itemsname = null;
+	public static boolean nmsItemsName = false;
 	
-	public Itemsname getItemsname(){
+	public static Itemsname getItemsname(){
 		return itemsname;
 	}
 	
@@ -118,8 +127,8 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		return itemsname != null;
 	}
 	
-	public HashMap<Player,Integer> editor = new HashMap<Player,Integer>();
-	public HashMap<Player,CraftArray> craft = new HashMap<Player,CraftArray>();
+	/*public HashMap<Player,Integer> editor = new HashMap<Player,Integer>();
+	public HashMap<Player,CraftArray> craft = new HashMap<Player,CraftArray>();*/
 	
 	public ArrayList<UUID> craftProc = new ArrayList<UUID>();
 	public HashMap<UUID,Location> caulLoc = new HashMap<UUID,Location>();
@@ -130,4 +139,5 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 			getLogger().info("CaulCrafting DEBUG " + player.getName() + ": " + msg);
 		}
 	}
+
 }
