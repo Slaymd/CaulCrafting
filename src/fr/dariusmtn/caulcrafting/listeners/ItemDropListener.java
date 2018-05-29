@@ -26,6 +26,8 @@ import fr.dariusmtn.caulcrafting.CraftArray;
 import fr.dariusmtn.caulcrafting.events.CaulCraftDroppingEvent;
 import fr.dariusmtn.caulcrafting.events.CaulCraftFailEvent;
 import fr.dariusmtn.caulcrafting.events.CaulCraftSuccessEvent;
+import fr.dariusmtn.editor.Editor;
+import fr.dariusmtn.editor.PlayerEditor;
 
 public class ItemDropListener implements Listener {
 	
@@ -54,14 +56,13 @@ public class ItemDropListener implements Listener {
 	public void onItemDrop(PlayerDropItemEvent e){
 		final Player player = e.getPlayer();
 		final Item item = e.getItemDrop();
+		Editor editor;
+		
 		//EDITOR BY DROPPING
-		if(plugin.editor.containsKey(player)){
+		if (PlayerEditor.isInEditor(player)) {
+			editor = PlayerEditor.getEditor(player);
 			e.setCancelled(true);
-			int editorstep = plugin.editor.get(player);
-			if(editorstep < 3){
-				String mode = "craft";
-				if(editorstep == 2)
-					mode = "result";
+			if(editor.getStep() < 3){
 				if(item != null){
 					ItemStack finalitem = item.getItemStack().clone();
 					//Amount
@@ -70,7 +71,7 @@ public class ItemDropListener implements Listener {
 					if(itemhand.isSimilar(finalitem))
 						finalitem.setAmount(player.getInventory().getItemInMainHand().getAmount()+1);
 					//Adding to the editor
-					plugin.editorUtils.addItem(player, finalitem, mode);
+					editor.addItem(player, finalitem);
 					return;
 				}
 				
