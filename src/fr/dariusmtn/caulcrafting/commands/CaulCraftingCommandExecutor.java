@@ -58,6 +58,7 @@ public class CaulCraftingCommandExecutor implements CommandExecutor {
 		Map<String, Runnable> subcmds = new HashMap<>();
 
 		subcmds.put("create", () -> CreateCraftCommand.createCommand(player, args));
+		subcmds.put("list", () -> ListCraftCommand.craftListCommand(player, args, plugin.craftStorage.getCrafts()));
 		//Is caulcrafting command (aliases are replaced by spigot before this call)
 		if (cmd.getName() == null || !cmd.getName().equalsIgnoreCase("caulcrafting"))
 			return false;
