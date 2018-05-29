@@ -9,16 +9,13 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.dariusmtn.caulcrafting.CaulCrafting;
 import fr.dariusmtn.caulcrafting.CraftArray;
+import fr.dariusmtn.caulcrafting.CraftFormatting;
+import fr.dariusmtn.caulcrafting.Language;
 import fr.dariusmtn.editor.Editor;
 
 public class CreateCraftCommand {
-	
-	private CaulCrafting plugin;
-    public CreateCraftCommand(CaulCrafting instance) {
-          this.plugin = instance; 
-    }
     
-    private void dispEditorMessage(Player player, int nbTitleStrings, String... strings) {
+    private static void dispEditorMessage(Player player, int nbTitleStrings, String... strings) {
     	boolean title = false;
  
     	for (String str : strings) {
@@ -35,28 +32,28 @@ public class CreateCraftCommand {
     	}
     }
     
-    private void initCreateEditor(Player player) {
+    private static void initCreateEditor(Player player) {
     	//Listes éditeur
-    	plugin.editors.put(player.getUniqueId(), new Editor());
+    	CaulCrafting.editors.put(player.getUniqueId(), new Editor());
 		//Explications
-		this.dispEditorMessage(player, 2, plugin.lang.getTranslation("craftmaking_step_1"),
-				plugin.lang.getTranslation("craftmaking_step_1_explain"),
-				"---", plugin.lang.getTranslation("craftmaking_editor_cmd_exit"),
-				plugin.lang.getTranslation("craftmaking_editor_cmd_next"),
+		dispEditorMessage(player, 2, Language.getTranslation("craftmaking_step_1"),
+				Language.getTranslation("craftmaking_step_1_explain"),
+				"---", Language.getTranslation("craftmaking_editor_cmd_exit"),
+				Language.getTranslation("craftmaking_editor_cmd_next"),
 				"---");
     }
     
     @SuppressWarnings("deprecation")
-	public boolean createCommand(Player player, String[] args) {
+	public static boolean createCommand(Player player, String[] args) {
     	if (player == null)
     		return false;
     	if (!player.hasPermission("caulcrafting.admin.create")) {
-    		player.sendMessage("§c" + plugin.lang.getTranslation("general_do_not_permission"));
+    		player.sendMessage("§c" + Language.getTranslation("general_do_not_permission"));
     		return false;
     	}
-    	if (plugin.editors.containsKey(player.getUniqueId())) {
+    	if (CaulCrafting.editors.containsKey(player.getUniqueId())) {
     		//already in editor
-	    	player.sendMessage("§c" + plugin.lang.getTranslation("craftmaking_already_in"));
+	    	player.sendMessage("§c" + Language.getTranslation("craftmaking_already_in"));
 			return false;
     	}
     	if (args.length == 3) {
@@ -109,7 +106,7 @@ public class CreateCraftCommand {
 								try{
 									itms = new ItemStack(Material.getMaterial(eitm.toUpperCase()),amount);
 								} catch (Exception ee){
-									player.sendMessage("§c" + plugin.lang.getTranslation("craftmaking_wrong") + eitm);
+									player.sendMessage("§c" + Language.getTranslation("craftmaking_wrong") + eitm);
 								}
 							}
 							
@@ -129,19 +126,19 @@ public class CreateCraftCommand {
 			
 			if(!craftcmd.isEmpty()){
 				if(error == false){
-					player.sendMessage("§d§l➤ " + plugin.lang.getTranslation("craftmaking_thats_right"));
-					plugin.craftFormat.getCraftRecap(craftcmd, "§b" + plugin.lang.getTranslation("craftmaking_craft_typed"), false).send(player);
-					player.sendMessage("§e" + plugin.lang.getTranslation("craftmaking_craft_confirm_cmd"));
-					plugin.editors.put(player.getUniqueId(), new Editor());
-					plugin.editors.get(player.getUniqueId()).setCraft(craftcmd);
-					plugin.editors.get(player.getUniqueId()).setStep(3);
+					player.sendMessage("§d§l➤ " + Language.getTranslation("craftmaking_thats_right"));
+					CraftFormatting.getCraftRecap(craftcmd, "§b" + Language.getTranslation("craftmaking_craft_typed"), false).send(player);
+					player.sendMessage("§e" + Language.getTranslation("craftmaking_craft_confirm_cmd"));
+					CaulCrafting.editors.put(player.getUniqueId(), new Editor());
+					CaulCrafting.editors.get(player.getUniqueId()).setCraft(craftcmd);
+					CaulCrafting.editors.get(player.getUniqueId()).setStep(3);
 					return true;
 				}
 			}
 			return false;
     	} else {
     		//Init editor
-			this.initCreateEditor(player);
+			initCreateEditor(player);
 			return true;
     	}
     }

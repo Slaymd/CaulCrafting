@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import fr.dariusmtn.caulcrafting.CaulCrafting;
+import fr.dariusmtn.caulcrafting.Language;
 import mkremins.fanciful.FancyMessage;
 
 public class CaulCraftingCommandExecutor implements CommandExecutor {
@@ -20,7 +21,7 @@ public class CaulCraftingCommandExecutor implements CommandExecutor {
     }
     
     private boolean checkIfNeedLanguageSelection() {
-    	if (!plugin.lang.getExactLanguage().equalsIgnoreCase("default"))
+    	if (!Language.getExactLanguage().equalsIgnoreCase("default"))
     		return true;
     	//First load
     	if (player == null || !player.isOp()) {
@@ -33,7 +34,7 @@ public class CaulCraftingCommandExecutor implements CommandExecutor {
 		HashMap<String, String> langs = plugin.languagesAvailable;
 		for(String loc : langs.keySet()) {
 			new FancyMessage(" §e•§2 " + langs.get(loc))
-			.tooltip("§b" + plugin.lang.getTranslation("welcome_language_pickup_tooltip", loc))
+			.tooltip("§b" + Language.getTranslation("welcome_language_pickup_tooltip", loc))
 			.command("/caulcraftingconfig setlang " + loc)
 			.send(player);
 		}
@@ -41,14 +42,14 @@ public class CaulCraftingCommandExecutor implements CommandExecutor {
     }
     
     private void displayHelp() {
-    	player.sendMessage("§b§lCaulCrafting v" + plugin.getDescription().getVersion() + " §b" + plugin.lang.getTranslation("maincmd_by"));
+    	player.sendMessage("§b§lCaulCrafting v" + plugin.getDescription().getVersion() + " §b" + Language.getTranslation("maincmd_by"));
 		player.sendMessage("§7§l§m-----");
-		player.sendMessage("§6§l" + plugin.lang.getTranslation("maincmd_create").toUpperCase());
-		new FancyMessage("§e/caulcrafting §2create").tooltip("§e" + plugin.lang.getTranslation("general_click_here")).command("/caulcrafting create").send(player);
-		player.sendMessage("§7§l" + plugin.lang.getTranslation("maincmd_list").toUpperCase());
-		new FancyMessage("§e/caulcrafting §blist").tooltip("§b" + plugin.lang.getTranslation("general_click_here")).command("/caulcrafting list").send(player);
+		player.sendMessage("§6§l" + Language.getTranslation("maincmd_create").toUpperCase());
+		new FancyMessage("§e/caulcrafting §2create").tooltip("§e" + Language.getTranslation("general_click_here")).command("/caulcrafting create").send(player);
+		player.sendMessage("§7§l" + Language.getTranslation("maincmd_list").toUpperCase());
+		new FancyMessage("§e/caulcrafting §blist").tooltip("§b" + Language.getTranslation("general_click_here")).command("/caulcrafting list").send(player);
 		player.sendMessage("§7§l§m-----");
-		player.sendMessage("§d§l" + plugin.lang.getTranslation("maincmd_discord"));
+		player.sendMessage("§d§l" + Language.getTranslation("maincmd_discord"));
 		player.sendMessage("§bhttps://discord.gg/w628upr");
     }
     
@@ -56,7 +57,7 @@ public class CaulCraftingCommandExecutor implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		Map<String, Runnable> subcmds = new HashMap<>();
 
-		subcmds.put("create", () -> new CreateCraftCommand(plugin).createCommand(player, args));
+		subcmds.put("create", () -> CreateCraftCommand.createCommand(player, args));
 		//Is caulcrafting command (aliases are replaced by spigot before this call)
 		if (cmd.getName() == null || !cmd.getName().equalsIgnoreCase("caulcrafting"))
 			return false;

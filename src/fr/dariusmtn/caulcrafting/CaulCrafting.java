@@ -1,5 +1,6 @@
 package fr.dariusmtn.caulcrafting;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,11 +35,12 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	//Editors working
 	public static Map<UUID,Editor> editors = new HashMap<>();
 	
+	//Data folder
+	public static File dataFolder = null;
+	
 	public ConfigUpdate configUpdate = new ConfigUpdate(this);
 	public Config configUtils = new Config(this);
-	public Language lang = new Language(this);
 	public CraftStorage craftStorage = new CraftStorage(this);
-	public CraftFormatting craftFormat = new CraftFormatting(this);
 	//public Editor editorUtils = new Editor(this);
 	
 	//Languages availables list 
@@ -47,6 +49,8 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable(){
 		ConfigurationSerialization.registerClass(CraftArray.class);
+		//Save data folder
+		CaulCrafting.dataFolder = this.getDataFolder();
 		//Commands executors
 		this.getCommand("caulcrafting").setExecutor(new CaulCraftingCommandExecutor(this));
 		this.getCommand("caulcraftingconfig").setExecutor(new CaulCraftingConfigCommandExecutor(this));
@@ -80,8 +84,8 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		if(setupItemsname()){
 			nmsItemsName = true;
 		} else {
-			getLogger().severe(lang.getTranslation("updater_warn_1"));
-			getLogger().severe(lang.getTranslation("updater_warn_2"));
+			getLogger().severe(Language.getTranslation("updater_warn_1"));
+			getLogger().severe(Language.getTranslation("updater_warn_2"));
 			nmsItemsName = false;
 		}
 		//Stats (bstats) https://bstats.org/plugin/bukkit/CaulCrafting
@@ -89,7 +93,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		metrics.addCustomChart(new Metrics.SimplePie("used_languages", new Callable<String>() {
 	        @Override
 	        public String call() throws Exception {
-	            return lang.getLanguage();
+	            return Language.getLanguage();
 	        }
 	    }));
 	} 

@@ -10,6 +10,8 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.dariusmtn.caulcrafting.CaulCrafting;
 import fr.dariusmtn.caulcrafting.CraftArray;
+import fr.dariusmtn.caulcrafting.CraftFormatting;
+import fr.dariusmtn.caulcrafting.Language;
 import fr.dariusmtn.editor.PlayerEditor;
 import mkremins.fanciful.FancyMessage;
 
@@ -32,13 +34,13 @@ public class CaulCraftingConfigCommandExecutor implements CommandExecutor{
 			if(args.length > 0) {
 				if(args[0].equalsIgnoreCase("setlang")) {
 					if(args.length == 2 && plugin.languagesAvailable.containsKey(args[1])) {
-						String oldlang = plugin.lang.getExactLanguage();
-						plugin.lang.setLanguage(args[1]);
+						String oldlang = Language.getExactLanguage();
+						Language.setLanguage(args[1]);
 						if(oldlang.equalsIgnoreCase("default")) {
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 0);
-							player.sendMessage("§d§l➤ " + plugin.lang.getTranslation("welcome_lets_start_something"));
-							new FancyMessage(" §e•§2§l " + plugin.lang.getTranslation("welcome_create_craft")).tooltip("§b" + plugin.lang.getTranslation("general_click_here")).command("/caulcrafting create").send(player);
-							new FancyMessage(" §e•§2 " + plugin.lang.getTranslation("welcome_main_command")).tooltip("§b" + plugin.lang.getTranslation("general_click_here")).command("/caulcrafting").send(player);
+							player.sendMessage("§d§l➤ " + Language.getTranslation("welcome_lets_start_something"));
+							new FancyMessage(" §e•§2§l " + Language.getTranslation("welcome_create_craft")).tooltip("§b" + Language.getTranslation("general_click_here")).command("/caulcrafting create").send(player);
+							new FancyMessage(" §e•§2 " + Language.getTranslation("welcome_main_command")).tooltip("§b" + Language.getTranslation("general_click_here")).command("/caulcrafting").send(player);
 						}
 					}
 					return false;
@@ -51,7 +53,7 @@ public class CaulCraftingConfigCommandExecutor implements CommandExecutor{
 								if(Double.valueOf(args[2]) != null) {
 									double prob = Double.valueOf(args[2]);
 									editcraft.addResultItem(editcraft.getResultItems().get(itemnb),prob);
-									plugin.craftFormat.getCraftRecap(editcraft, "§e" + plugin.lang.getTranslation("craftmaking_craft_contents"), true).send(sender);
+									CraftFormatting.getCraftRecap(editcraft, "§e" + Language.getTranslation("craftmaking_craft_contents"), true).send(sender);
 									sender.sendMessage("§7§l§m-----");
 								}
 							}
@@ -72,7 +74,7 @@ public class CaulCraftingConfigCommandExecutor implements CommandExecutor{
 									ItemStack itemtodel = editcraft.getResultItems().get(itemnb);
 									editcraft.removeResultItem(itemtodel);
 								}
-								plugin.craftFormat.getCraftRecap(editcraft, "§e" + plugin.lang.getTranslation("craftmaking_craft_contents"), true).send(sender);
+								CraftFormatting.getCraftRecap(editcraft, "§e" + Language.getTranslation("craftmaking_craft_contents"), true).send(sender);
 								sender.sendMessage("§7§l§m-----");
 							}
 						}
@@ -90,13 +92,13 @@ public class CaulCraftingConfigCommandExecutor implements CommandExecutor{
 						cmdsen = cmdsen.replace(args[0] + " ", "");
 						if(!editcraft.getCmds().contains("opcmd" + cmdsen) && !editcraft.getCmds().contains("plcmd" + cmdsen)) {
 							//Adding command
-							sender.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_cmd_added") + "§a " + cmdsen);
+							sender.sendMessage("§7" + Language.getTranslation("craftmaking_cmd_added") + "§a " + cmdsen);
 							editcraft.addCmd(mode + cmdsen);
 							//Delete option
-							new FancyMessage("§3" + plugin.lang.getTranslation("craftmaking_craft_options") + " ").then("[" + plugin.lang.getTranslation("craftmaking_cmd_delete") + "]")
-							.color(ChatColor.RED).tooltip("§b" + plugin.lang.getTranslation("general_click_here")).suggest("/ccc " + (mode == "plcmd" ? "delplayercmd" : "delconsolecmd") + " " + cmdsen).send(sender);
+							new FancyMessage("§3" + Language.getTranslation("craftmaking_craft_options") + " ").then("[" + Language.getTranslation("craftmaking_cmd_delete") + "]")
+							.color(ChatColor.RED).tooltip("§b" + Language.getTranslation("general_click_here")).suggest("/ccc " + (mode == "plcmd" ? "delplayercmd" : "delconsolecmd") + " " + cmdsen).send(sender);
 							//Craft recap
-							plugin.craftFormat.getCraftRecap(editcraft, "§e" + plugin.lang.getTranslation("craftmaking_craft_contents"), true).send(sender);
+							CraftFormatting.getCraftRecap(editcraft, "§e" + Language.getTranslation("craftmaking_craft_contents"), true).send(sender);
 							sender.sendMessage("§7§l§m-----");
 						}
 					}
@@ -114,10 +116,10 @@ public class CaulCraftingConfigCommandExecutor implements CommandExecutor{
 						cmdsen = cmdsen.replace(args[0] + " ", "");
 						if(editcraft.getCmds().contains(mode + cmdsen)) {
 							//Removing command
-							sender.sendMessage("§7" + plugin.lang.getTranslation("craftmaking_cmd_deleted") + "§c§m " + cmdsen);
+							sender.sendMessage("§7" + Language.getTranslation("craftmaking_cmd_deleted") + "§c§m " + cmdsen);
 							editcraft.removeCmd(mode + cmdsen);
 							//Craft recap
-							plugin.craftFormat.getCraftRecap(editcraft, "§e" + plugin.lang.getTranslation("craftmaking_craft_contents"), true).send(sender);
+							CraftFormatting.getCraftRecap(editcraft, "§e" + Language.getTranslation("craftmaking_craft_contents"), true).send(sender);
 							sender.sendMessage("§7§l§m-----");
 						}
 					}

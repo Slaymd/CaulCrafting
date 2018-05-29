@@ -12,12 +12,7 @@ import mkremins.fanciful.FancyMessage;
 
 public class CraftFormatting implements Listener {
     
-	private CaulCrafting plugin;
-    public CraftFormatting(CaulCrafting instance) {
-          this.plugin = instance; 
-    }
-    
-    public FancyMessage getCraftRecap(CraftArray globalcraft, String headtext, boolean editor){
+    public static FancyMessage getCraftRecap(CraftArray globalcraft, String headtext, boolean editor){
 		ArrayList<ItemStack> need = globalcraft.getCraft();
 		HashMap<ItemStack,Integer> result = globalcraft.getResult();
 		ArrayList<String> cmds = globalcraft.getCmds();
@@ -30,16 +25,16 @@ public class CraftFormatting implements Listener {
 				String name = getName(item);
 				formcraft.then((first ? "" : ", ") + name);
 				if(item.hasItemMeta() && item.getItemMeta().hasEnchants()) {
-					formcraft.then(" ").then("ℇ").color(ChatColor.LIGHT_PURPLE).style(ChatColor.BOLD).tooltip("§b" + plugin.lang.getTranslation("general_enchanted"));
+					formcraft.then(" ").then("ℇ").color(ChatColor.LIGHT_PURPLE).style(ChatColor.BOLD).tooltip("§b" + Language.getTranslation("general_enchanted"));
 				}
 				if(editor == true)
-					formcraft.then(" ").then("✕").color(ChatColor.RED).tooltip("§b" + plugin.lang.getTranslation("craftmaking_delete_item")).command("/caulcraftingconfig delitem " + count + " craft");
+					formcraft.then(" ").then("✕").color(ChatColor.RED).tooltip("§b" + Language.getTranslation("craftmaking_delete_item")).command("/caulcraftingconfig delitem " + count + " craft");
 				formcraft.then("§r");
 				first = false;
 				count++;
 			}
 		} else {
-			formcraft.then(plugin.lang.getTranslation("general_undefined")).color(ChatColor.GRAY).style(ChatColor.ITALIC);
+			formcraft.then(Language.getTranslation("general_undefined")).color(ChatColor.GRAY).style(ChatColor.ITALIC);
 		}
 		first = true;
 		count = 0;
@@ -50,15 +45,15 @@ public class CraftFormatting implements Listener {
 				String name = getName(item);
 				formcraft.then((first ? "" : ", ") + name);
 				if(item.hasItemMeta() && item.getItemMeta().hasEnchants()) {
-					formcraft.then(" ").then("ℇ").color(ChatColor.LIGHT_PURPLE).style(ChatColor.BOLD).tooltip("§b" + plugin.lang.getTranslation("general_enchanted"));
+					formcraft.then(" ").then("ℇ").color(ChatColor.LIGHT_PURPLE).style(ChatColor.BOLD).tooltip("§b" + Language.getTranslation("general_enchanted"));
 				}
 				double luck = result.get(item)/10;
 				if(luck < 100) {
 					String luckStr = (String.valueOf(luck) + " ").replace(".0 ", "").replace(" ", "");
-					formcraft.then(" ").then("☘").color(ChatColor.YELLOW).tooltip("§e" + plugin.lang.getTranslation("general_drop_chance").replace("%chance%", "§6§l" + luckStr));
+					formcraft.then(" ").then("☘").color(ChatColor.YELLOW).tooltip("§e" + Language.getTranslation("general_drop_chance").replace("%chance%", "§6§l" + luckStr));
 				}
 				if(editor == true)
-					formcraft.then(" ").then("✕").color(ChatColor.RED).tooltip("§b" + plugin.lang.getTranslation("craftmaking_delete_item")).command("/caulcraftingconfig delitem " + count + " result");
+					formcraft.then(" ").then("✕").color(ChatColor.RED).tooltip("§b" + Language.getTranslation("craftmaking_delete_item")).command("/caulcraftingconfig delitem " + count + " result");
 				formcraft.then("§r");
 				first = false;
 				count++;
@@ -66,7 +61,7 @@ public class CraftFormatting implements Listener {
 		} else {
 			first = true;
 			if(cmds.isEmpty())
-				formcraft.then(plugin.lang.getTranslation("general_undefined")).color(ChatColor.GRAY).style(ChatColor.ITALIC);
+				formcraft.then(Language.getTranslation("general_undefined")).color(ChatColor.GRAY).style(ChatColor.ITALIC);
 		}
 		count = 0;
 		if(!cmds.isEmpty()) {
