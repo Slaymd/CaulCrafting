@@ -22,6 +22,7 @@ import fr.dariusmtn.caulcrafting.itemsname.Itemsname;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_10_R1;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_11_R1;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_12_R1;
+import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_13_R1;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_9_R1;
 import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_9_R2;
 import fr.dariusmtn.caulcrafting.listeners.AsyncPlayerChatListener;
@@ -74,6 +75,7 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		languagesAvailable.put("zh", "中文");
 		languagesAvailable.put("hu", "Magyar");
 		languagesAvailable.put("lv", "Latviešu valoda");
+		languagesAvailable.put("ko", "한국어");
 		//Defaults configs files (locales..)
 		configUtils.setupDefaults();
 		//Load defaults configs if empty
@@ -107,23 +109,35 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	
 	private boolean setupItemsname(){
 		String version;
+		
 		try{
 			version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
 		} catch (Exception e){
 			return false;
 		}
-		//Gestion des versions
-		if(version.equalsIgnoreCase("v1_12_R1")){
+		
+		//Getting itemsname class specific version
+		switch (version) {
+		case "v1_13_R1":
+			itemsname = new Itemsname_1_13_R1();
+			break;
+		case "v1_12_R1":
 			itemsname = new Itemsname_1_12_R1();
-		} else if(version.equalsIgnoreCase("v1_11_R1")){
+			break;
+		case "v1_11_R1":
 			itemsname = new Itemsname_1_11_R1();
-		} else if(version.equalsIgnoreCase("v1_10_R1")){
+			break;
+		case "v1_10_R1":
 			itemsname = new Itemsname_1_10_R1();
-		} else if(version.equalsIgnoreCase("v1_9_R2")){
+			break;
+		case "v1_9_R2":
 			itemsname = new Itemsname_1_9_R2();
-		} else if(version.equalsIgnoreCase("v1_9_R1")){
+			break;
+		case "v1_9_R1":
 			itemsname = new Itemsname_1_9_R1();
+			break;
 		}
+
 		return itemsname != null;
 	}
 	

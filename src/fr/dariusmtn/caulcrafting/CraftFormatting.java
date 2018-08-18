@@ -39,7 +39,7 @@ public class CraftFormatting implements Listener {
 		first = true;
 		count = 0;
 		formcraft.then(" ").then("--").color(ChatColor.YELLOW).style(ChatColor.BOLD).style(ChatColor.STRIKETHROUGH).then(">").color(ChatColor.YELLOW).style(ChatColor.BOLD).then(" §r");
-		//Elements donnés 
+		//Elements donnés
 		if(!result.isEmpty()){
 			for(ItemStack item : result.keySet()){
 				String name = getName(item);

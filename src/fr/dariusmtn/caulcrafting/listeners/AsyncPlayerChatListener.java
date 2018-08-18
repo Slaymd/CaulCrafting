@@ -51,11 +51,20 @@ public class AsyncPlayerChatListener implements Listener {
 						String cmd = msg.replace("cmd ", "");
 						if(!cmd.startsWith("/"))
 							cmd = "/" + cmd;
-						new FancyMessage("§e" + Language.getTranslation("craftmaking_cmd_whosend") + " ").then("[" + Language.getTranslation("craftmaking_cmd_console") + "]")
-						.color(ChatColor.GOLD).tooltip("§b" + Language.getTranslation("general_click_here")).command("/ccc addconsolecmd " + cmd).then(" ")
-						.then("[" + Language.getTranslation("craftmaking_cmd_player") + "]")
-						.color(ChatColor.GOLD).tooltip("§b" + Language.getTranslation("general_click_here")).command("/ccc addplayercmd " + cmd).send(player);
-						player.sendMessage("§7§l§m-----");
+						final String fcmd = cmd;
+						final Player fplayer = player;
+						//Sending options
+						plugin.getServer().getScheduler().runTask(plugin, new Runnable() {
+							@Override
+							public void run() {
+								FancyMessage chatCmds = new FancyMessage("§e" + Language.getTranslation("craftmaking_cmd_whosend") + " ").then("[" + Language.getTranslation("craftmaking_cmd_console") + "]")
+								.color(ChatColor.GOLD).tooltip("§b" + Language.getTranslation("general_click_here")).command("/ccc addconsolecmd " + fcmd).then(" ")
+								.then("[" + Language.getTranslation("craftmaking_cmd_player") + "]")
+								.color(ChatColor.GOLD).tooltip("§b" + Language.getTranslation("general_click_here")).command("/ccc addplayercmd " + fcmd);
+						    	chatCmds.send(fplayer);
+						    	player.sendMessage("§7§l§m-----");
+							}
+						});
 					}
 				}
 				//Adding to craft
@@ -63,7 +72,12 @@ public class AsyncPlayerChatListener implements Listener {
 					ItemStack item = player.getInventory().getItemInMainHand();
 					if(item != null){
 						//Add item
-						editor.addItem(player, item);
+						plugin.getServer().getScheduler().runTask(plugin, new Runnable() {
+							@Override
+							public void run() {
+								editor.addItem(player, item);
+							}
+						});
 					}
 				}
 				//passer à l'étape suivante
@@ -84,12 +98,17 @@ public class AsyncPlayerChatListener implements Listener {
 						}
 					} else if(mode == "result"){ //Enregistrement
 						if(!globalcraft.getResult().isEmpty() || !globalcraft.getCmds().isEmpty()){
-							player.sendMessage(" ");
-							player.sendMessage("§a§l➤ " + Language.getTranslation("craftmaking_step_final"));
-							CraftFormatting.getCraftRecap(globalcraft, "§e" + Language.getTranslation("craftmaking_craft_created"), false).send(player);
-							plugin.craftStorage.addCraft(globalcraft);
-							PlayerEditor.exitEditor(player);
-							plugin.reloadConfig();
+							plugin.getServer().getScheduler().runTask(plugin, new Runnable() {
+								@Override
+								public void run() {
+									player.sendMessage(" ");
+									player.sendMessage("§a§l➤ " + Language.getTranslation("craftmaking_step_final"));
+									CraftFormatting.getCraftRecap(globalcraft, "§e" + Language.getTranslation("craftmaking_craft_created"), false).send(player);
+									plugin.craftStorage.addCraft(globalcraft);
+									PlayerEditor.exitEditor(player);
+									plugin.reloadConfig();
+								}
+							});
 						} else {
 							player.sendMessage("§c" + Language.getTranslation("craftmaking_step_2_add_items"));
 						}
@@ -107,11 +126,16 @@ public class AsyncPlayerChatListener implements Listener {
 				if(editorstep == 3){
 					//Craft entré via commande, demande de confirmation
 					if(msg.equalsIgnoreCase("yes")){
-						player.sendMessage("§a§l➤ " + Language.getTranslation("craftmaking_step_final"));
-						CraftFormatting.getCraftRecap(editor.getCraft(), "§e" + Language.getTranslation("craftmaking_craft_created"), false).send(player);
-						plugin.craftStorage.addCraft(editor.getCraft());
-						PlayerEditor.exitEditor(player);
-						plugin.reloadConfig();
+						plugin.getServer().getScheduler().runTask(plugin, new Runnable() {
+							@Override
+							public void run() {
+								player.sendMessage("§a§l➤ " + Language.getTranslation("craftmaking_step_final"));
+								CraftFormatting.getCraftRecap(editor.getCraft(), "§e" + Language.getTranslation("craftmaking_craft_created"), false).send(player);
+								plugin.craftStorage.addCraft(editor.getCraft());
+								PlayerEditor.exitEditor(player);
+								plugin.reloadConfig();
+							}
+						});
 					} else if(msg.equalsIgnoreCase("no")){
 						PlayerEditor.exitEditor(player);
 						player.sendMessage("§c" + Language.getTranslation("craftmaking_canceled"));
