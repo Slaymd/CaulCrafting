@@ -23,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.dariusmtn.caulcrafting.CaulCrafting;
 import fr.dariusmtn.caulcrafting.CraftArray;
+import fr.dariusmtn.caulcrafting.CrossVersionSounds;
 import fr.dariusmtn.caulcrafting.events.CaulCraftDroppingEvent;
 import fr.dariusmtn.caulcrafting.events.CaulCraftFailEvent;
 import fr.dariusmtn.caulcrafting.events.CaulCraftSuccessEvent;
@@ -172,7 +173,7 @@ public class ItemDropListener implements Listener {
 						
 						//Event: CaulCraftSuccessEvent
 						plugin.sendDebug(player,"API : CaulCraftSuccessEvent");
-						CaulCraftSuccessEvent ccEvent = new CaulCraftSuccessEvent(actualcraft, player, plugin.caulLoc.get(player.getUniqueId()).getBlock(), Particle.FIREWORKS_SPARK, Sound.ENTITY_PLAYER_LEVELUP);
+						CaulCraftSuccessEvent ccEvent = new CaulCraftSuccessEvent(actualcraft, player, plugin.caulLoc.get(player.getUniqueId()).getBlock(), Particle.FIREWORKS_SPARK, CrossVersionSounds.LEVEL_UP.bukkitSound());
 						plugin.getServer().getPluginManager().callEvent(ccEvent);
 						
 						if(ccEvent.isCancelled()) {

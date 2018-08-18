@@ -1,7 +1,6 @@
 package fr.dariusmtn.caulcrafting.commands;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -12,6 +11,7 @@ import fr.dariusmtn.caulcrafting.CaulCrafting;
 import fr.dariusmtn.caulcrafting.CraftArray;
 import fr.dariusmtn.caulcrafting.CraftFormatting;
 import fr.dariusmtn.caulcrafting.Language;
+import fr.dariusmtn.caulcrafting.CrossVersionSounds;
 import fr.dariusmtn.editor.PlayerEditor;
 import mkremins.fanciful.FancyMessage;
 
@@ -37,7 +37,7 @@ public class CaulCraftingConfigCommandExecutor implements CommandExecutor{
 						String oldlang = Language.getExactLanguage();
 						Language.setLanguage(args[1]);
 						if(oldlang.equalsIgnoreCase("default")) {
-							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 0);
+							player.playSound(player.getLocation(), CrossVersionSounds.NOTE_PLING.bukkitSound(), 1, 0);
 							player.sendMessage("§d§l➤ " + Language.getTranslation("welcome_lets_start_something"));
 							new FancyMessage(" §e•§2§l " + Language.getTranslation("welcome_create_craft")).tooltip("§b" + Language.getTranslation("general_click_here")).command("/caulcrafting create").send(player);
 							new FancyMessage(" §e•§2 " + Language.getTranslation("welcome_main_command")).tooltip("§b" + Language.getTranslation("general_click_here")).command("/caulcrafting").send(player);
