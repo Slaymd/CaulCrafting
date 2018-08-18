@@ -22,7 +22,7 @@ public class Editor{
 		this.mode = EditorMode.NORMAL;
 		this.data = 1;
 	}
-	
+
 	public void addItem(Player player, ItemStack item) {
 		String itemName = CraftFormatting.getName(item);
 		Integer itemIndex = 0;
@@ -39,14 +39,12 @@ public class Editor{
 			//Drop chance button
 			options.then("[" + Language.getTranslation("craftmaking_craft_options_dropchance") + "]")
 			.color(ChatColor.GOLD).tooltip("§b" + Language.getTranslation("general_click_here")).suggest("/ccc setdropchance " + itemIndex + " <0.01-100>").then(" ");
-			
 		}
 		//Next step button
 		options.then("[" + Language.getTranslation("craftmaking_next_step") + "]").color(ChatColor.GREEN).style(ChatColor.BOLD).tooltip("§b" + Language.getTranslation("general_click_here")).command("next");
 		//Craft recap
 		CraftFormatting.getCraftRecap(this.craft, "§e" + Language.getTranslation("craftmaking_craft_contents"), true).send(player);
 		//Sending option buttons
-		options.then("[" + Language.getTranslation("craftmaking_next_step") + "]").color(ChatColor.GREEN).style(ChatColor.BOLD).tooltip("§b" + Language.getTranslation("general_click_here")).command("next");
 		options.send(player);
 		player.sendMessage("§7§l§m-----");
 	}
@@ -106,35 +104,5 @@ public class Editor{
 	public void setData(int data) {
 		this.data = data;
 	}
-    
-//    public void addItem(Player player, ItemStack item, String mode) {
-//		//Affichage du nom
-//		String name = plugin.craftFormat.getName(item);
-//		player.sendMessage("§7" + Language.getTranslation("craftmaking_item_added") + "§a " + name);
-//		//Ajout définitif
-//		CraftArray globalcraft = plugin.craft.get(player);
-//		int nb = -1;
-//		if(mode == "craft") {
-//			globalcraft.addCraftItem(item);
-//		} else {
-//			globalcraft.addResultItem(item);
-//			nb = globalcraft.getResultItems().indexOf(item);
-//		}
-//		plugin.craft.put(player, globalcraft);
-//		//Recap
-//		plugin.craftFormat.getCraftRecap(globalcraft, "§e" + Language.getTranslation("craftmaking_craft_contents"), true).send(player);
-//		//Options
-//		FancyMessage options = new FancyMessage("§3" + Language.getTranslation("craftmaking_craft_options") + " ");
-//		//Probability
-//		if(nb > -1) {
-//			options.then("[" + Language.getTranslation("craftmaking_craft_options_dropchance") + "]")
-//			.color(ChatColor.GOLD).tooltip("§b" + Language.getTranslation("general_click_here")).suggest("/ccc setdropchance " + nb + " <0.01-100>").then(" ");
-//		}
-//		//Next Step
-//		options.then("[" + Language.getTranslation("craftmaking_next_step") + "]").color(ChatColor.GREEN).style(ChatColor.BOLD).tooltip("§b" + Language.getTranslation("general_click_here")).command("next");
-//		options.send(player);
-//		//Rappel commandes
-//		player.sendMessage("§7§l§m-----");
-//    }
 
 }

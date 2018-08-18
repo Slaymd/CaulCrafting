@@ -67,7 +67,7 @@ public class CraftStorage implements Listener {
 			}
 			craftconfig.save(craftfile);
     	} catch (Exception e) {
-    		//
+    		e.printStackTrace();
     	}
     }
     
@@ -79,7 +79,7 @@ public class CraftStorage implements Listener {
 			craftconfig.set("Crafts." + UUID.randomUUID(), globalcraft.serialize());
 			craftconfig.save(craftfile);
     	} catch (Exception e) {
-    		//
+    		e.printStackTrace();
     	}
 	}
 

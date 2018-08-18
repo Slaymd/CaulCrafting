@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="lib/spigot-1.12.jar"/>
 	<classpathentry kind="lib" path="lib/spigot-1.9-R0.1-SNAPSHOT-latest.jar"/>
 	<classpathentry kind="lib" path="lib/spigot-1.9.4-R0.1-SNAPSHOT-latest.jar"/>
+	<classpathentry kind="lib" path="/Users/slaymd/Epitech/Projects/Spigot/CaulCrafting/lib/spigot-1.13.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
