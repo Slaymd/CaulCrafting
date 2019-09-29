@@ -1,0 +1,30 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="CaulCrafting:jar">
+    <output-path>$PROJECT_DIR$/classes/artifacts/CaulCrafting_jar</output-path>
+    <root id="archive" name="CaulCrafting.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="CaulCrafting" />
+      <element id="file-copy" path="$PROJECT_DIR$/config_locale.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/config.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/cs.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/de.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/en.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/es.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/fr.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/hu.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/it.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/ja.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/ko.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/lv.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/nl.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/pl.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/plugin.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/pt.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/ru.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/vi.properties" />
+      <element id="file-copy" path="$PROJECT_DIR$/zh.properties" />
+    </root>
+  </artifact>
+</component>

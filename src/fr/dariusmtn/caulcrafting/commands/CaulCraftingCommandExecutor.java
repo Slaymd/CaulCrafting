@@ -16,6 +16,7 @@ public class CaulCraftingCommandExecutor implements CommandExecutor {
 
 	private CaulCrafting plugin;
 	private Player player;
+
     public CaulCraftingCommandExecutor(CaulCrafting instance) {
           this.plugin = instance; 
     }
@@ -59,6 +60,7 @@ public class CaulCraftingCommandExecutor implements CommandExecutor {
 
 		subcmds.put("create", () -> CreateCraftCommand.createCommand(player, args));
 		subcmds.put("list", () -> ListCraftCommand.craftListCommand(player, args, plugin.craftStorage.getCrafts()));
+		subcmds.put("remove", () -> RemoveCraftCommand.removeCraftCommand(player, args, plugin));
 		
 		//Is caulcrafting command (aliases are replaced by spigot before this call)
 		if (cmd.getName() == null || !cmd.getName().equalsIgnoreCase("caulcrafting"))

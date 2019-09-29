@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
+import fr.dariusmtn.caulcrafting.itemsname.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -18,13 +19,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.dariusmtn.caulcrafting.commands.CaulCraftingCommandExecutor;
 import fr.dariusmtn.caulcrafting.commands.CaulCraftingConfigCommandExecutor;
-import fr.dariusmtn.caulcrafting.itemsname.Itemsname;
-import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_10_R1;
-import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_11_R1;
-import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_12_R1;
-import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_13_R1;
-import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_9_R1;
-import fr.dariusmtn.caulcrafting.itemsname.Itemsname_1_9_R2;
 import fr.dariusmtn.caulcrafting.listeners.AsyncPlayerChatListener;
 import fr.dariusmtn.caulcrafting.listeners.BlockPistonExtendListener;
 import fr.dariusmtn.caulcrafting.listeners.BlockPistonRetractListener;
@@ -43,10 +37,10 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 	public Config configUtils = new Config(this);
 	public CraftStorage craftStorage = new CraftStorage(this);
 	//public Editor editorUtils = new Editor(this);
-	
+
 	//Languages availables list 
 	public HashMap<String, String> languagesAvailable = new HashMap<String,String>();
-	
+
 	@Override
 	public void onEnable(){
 		ConfigurationSerialization.registerClass(CraftArray.class);
@@ -119,6 +113,9 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		
 		//Getting itemsname class specific version
 		switch (version) {
+		case "v1_14_R1":
+			itemsname = new Itemsname_1_14_R1();
+			break;
 		case "v1_13_R1":
 			itemsname = new Itemsname_1_13_R1();
 			break;
