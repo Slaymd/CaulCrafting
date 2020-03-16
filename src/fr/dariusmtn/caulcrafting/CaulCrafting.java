@@ -113,6 +113,9 @@ public class CaulCrafting extends JavaPlugin implements Listener {
 		
 		//Getting itemsname class specific version
 		switch (version) {
+		case "v1_15_R1":
+			itemsname = new Itemsname_1_15_R1();
+			break;
 		case "v1_14_R1":
 			itemsname = new Itemsname_1_14_R1();
 			break;

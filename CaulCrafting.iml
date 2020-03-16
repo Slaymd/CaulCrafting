@@ -7,6 +7,8 @@
     <libelement value="jar://$MODULE_DIR$/lib/spigot-1.9-R0.1-SNAPSHOT-latest.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/spigot-1.9.4-R0.1-SNAPSHOT-latest.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/spigot-1.13.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/Spigot-1.14.4.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/spigot-1.15.2.jar!/" />
     <src_description expected_position="0">
       <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
     </src_description>
@@ -86,5 +88,17 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/spigot-1.15.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/spigot-1.15.2.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="spigot-1.15.2" level="project" />
   </component>
 </module>
