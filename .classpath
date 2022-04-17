@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/Spigot 1.10.jar"/>
-	<classpathentry kind="lib" path="lib/Spigot-1.11.2.jar"/>
-	<classpathentry kind="lib" path="lib/spigot-1.12.jar"/>
-	<classpathentry kind="lib" path="lib/spigot-1.9-R0.1-SNAPSHOT-latest.jar"/>
-	<classpathentry kind="lib" path="lib/spigot-1.9.4-R0.1-SNAPSHOT-latest.jar"/>
-	<classpathentry kind="lib" path="/Users/slaymd/Epitech/Projects/Spigot/CaulCrafting/lib/spigot-1.13.jar"/>
+	<classpathentry kind="lib" path="lib/spigot/spigot-1.10.jar"/>
+	<classpathentry kind="lib" path="lib/spigot/spigot-1.11.2.jar"/>
+	<classpathentry kind="lib" path="lib/spigot/spigot-1.12.jar"/>
+	<classpathentry kind="lib" path="lib/spigot/spigot-1.9.jar"/>
+	<classpathentry kind="lib" path="lib/spigot/spigot-1.9.4.jar"/>
+	<classpathentry kind="lib" path="lib/spigot/spigot-1.13.jar"/>
+	<classpathentry kind="lib" path="lib/spigot/spigot-1.14.4.jar"/>
+	<classpathentry kind="lib" path="lib/spigot/spigot-1.15.2.jar"/>
+	<classpathentry kind="lib" path="lib/spigot/spigot-1.16.1.jar"/>
+	<classpathentry kind="lib" path="lib/spigot/spigot-1.16.2.jar"/>
+	<classpathentry kind="lib" path="lib/spigot/spigot-1.17.jar"/>
+	<classpathentry kind="lib" path="lib/spigot/spigot-1.18.1.jar"/>
+	<classpathentry kind="src" path="target/generated-sources/annotations">
+		<attributes>
+			<attribute name="optional" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
