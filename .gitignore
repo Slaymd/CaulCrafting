@@ -1,5 +1,6 @@
 /bin/
 /releases/
 classes/
-src/META-INF/
-src/main/
+target/
+.vscode/
+.idea/
